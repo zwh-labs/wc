@@ -1,0 +1,16 @@
+*.o
+*.d
+*.bin
+*.eep
+*.elf
+*.hex
+*.lss
+*.map
+*.sym
+*.cmake
+CMakeCache.txt
+CMakeFiles/
+wclib/Makefile
+wclib/bin/
+wclib/lib/
+wclib/test/Makefile
