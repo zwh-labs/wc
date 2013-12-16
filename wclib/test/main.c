@@ -18,7 +18,9 @@ int main( void )
 		exit( 1 );
 	}
 
-	uint8_t buffer[WCPACKET_MAXLENGTH];
+	uint8_t buffer[WCPACKET_MAXSIZE];
+	WCPacket_RequestInfo_create( (WCPacket_RequestInfo*)buffer );
+	WCIO_Unix_write( wcDevice, buffer );
 	while( 1 )
 	{
 		WCPacket_Header * header = (WCPacket_Header*)buffer;

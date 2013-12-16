@@ -53,34 +53,6 @@ void timer1_init(void)
 	TIMSK1 = _BV(OCIE1A);
 }
 
-/*
-ISR( TIMER3_COMPA_vect )
-{
-	WCPacket_Message_create( &message, "WCFW created on "__DATE__" "__TIME__ );
-}
-
-
-void timer3_init(void)
-{
-	// normal port operation OCnA/OCnB/OCnC disconnected; CTC mode
-	TCCR3A = 0;
-
-	//       CTC mode       clk/64
-	TCCR3B = _BV(WGM32) | _BV(CS32) | _BV(CS30);
-
-	// not forcing output compare
-	TCCR3C = 0;
-
-	// timer counter initial value (16 bit value)
-	TCNT3 = 0;
-
-	// compare value
-	OCR3A = 20000;
-
-	// enable Timer/Counter3 Output Compare A Match interrupt
-	TIMSK3 = _BV(OCIE3A);
-}
-*/
 
 void SetupHardware(void)
 {
@@ -96,7 +68,6 @@ void SetupHardware(void)
 
 	IncRotDec_init( &incRotDec, &DDRF, &PINF, &PORTF, _BV(PINF0), _BV(PINF1) );
 	timer1_init();
-//	timer3_init();
 }
 
 
@@ -113,26 +84,42 @@ int main(void)
 }
 
 
+void interpretPacket( const WCPacket * packet )
+{
+	switch( packet->header.type )
+	{
+		case WCPACKET_REQUESTINFO_TYPE:
+			WCPacket_Message_create( &message, "#WCFW created on "__DATE__" "__TIME__ );
+			break;
+	}
+}
+
+
 /** Function to manage CDC data transmission and reception to and from the host. */
 void CDC_Task(void)
 {
 	if( USB_DeviceState != DEVICE_STATE_Configured )
 		return;
 
+	////////////////////////////////
+	// write to host
 	Endpoint_SelectEndpoint( CDC_TX_EPADDR );
 
+	// write message if available
 	if( message.header.length )
 	{
 		Endpoint_Write_Stream_LE( &message, WCPacket_size((WCPacket_Header*)&message), NULL );
-		message.header.length = 0;
+		message.header.length = 0; // empty message, so we won't send the same message again
 	}
 
+	// write wheel counters
 	int16_t value = 0;
 	uint8_t error = IncRotDec_retrieve( &incRotDec, &value );
 	WCPacket_Wheel wheel;
 	WCPacket_Wheel_create( &wheel, 0, error, value );
 	Endpoint_Write_Stream_LE( &wheel, WCPacket_size((WCPacket_Header*)&wheel), NULL );
 
+	// clear
 	bool isFull = (Endpoint_BytesInEndpoint() == CDC_TXRX_EPSIZE);
 	Endpoint_ClearIN();
 	if( isFull )
@@ -141,9 +128,28 @@ void CDC_Task(void)
 		Endpoint_ClearIN();
 	}
 
+	////////////////////////////////
+	// read from host
 	Endpoint_SelectEndpoint( CDC_RX_EPADDR );
 	if( Endpoint_IsOUTReceived() )
 	{
+		uint8_t ret;
+		uint8_t buffer[WCPACKET_MAXSIZE];
+		ret = Endpoint_Read_Stream_LE( buffer, sizeof(WCPacket_Header), NULL );
+		if( ret == ENDPOINT_RWSTREAM_NoError )
+		{
+			WCPacket_Header * header = (WCPacket_Header*)buffer;
+			if( (sizeof(WCPacket_Header) + header->length) > WCPACKET_MAXSIZE )
+			{
+				Endpoint_Discard_Stream( header->length, NULL );
+			}
+			else
+			{
+				ret = Endpoint_Read_Stream_LE( buffer + sizeof(WCPacket_Header), header->length, NULL );
+				if( ret == ENDPOINT_RWSTREAM_NoError )
+					interpretPacket( (const WCPacket*)buffer );
+			}
+		}
 		Endpoint_ClearOUT();
 	}
 }

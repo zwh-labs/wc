@@ -27,3 +27,10 @@ void WCPacket_Wheel_create( WCPacket_Wheel * wheel, uint8_t channel, uint8_t err
 	wheel->error = error;
 	wheel->value = value;
 }
+
+
+void WCPacket_RequestInfo_create( WCPacket_RequestInfo * requestInfo )
+{
+	requestInfo->header.type = WCPACKET_REQUESTINFO_TYPE;
+	requestInfo->header.length = 0;
+}
