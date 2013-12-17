@@ -29,7 +29,9 @@ int WCIO_open( const char * file )
 		return -1; // CreateFile failed
 
 	//TODO: check this
-	GetCommConfig(handles[fd], &cfg, &n);
+	COMMCONFIG cfg;
+	DWORD cfgSize = sizeof(COMMCONFIG);
+	GetCommConfig( handles[fd], &cfg, &cfgSize );
 	cfg.dcb.BaudRate = 115200;
 	cfg.dcb.fBinary = TRUE;
 	cfg.dcb.fParity = FALSE;
@@ -49,16 +51,17 @@ int WCIO_open( const char * file )
 	cfg.dcb.ByteSize = 8;
 	cfg.dcb.Parity = NOPARITY;
 	cfg.dcb.StopBits = ONESTOPBIT;
-	SetCommConfig(handles[fd], &cfg, n);
+	SetCommConfig( handles[fd], &cfg, cfgSize );
 
 	//TODO: check this
-	GetCommTimeouts(handles[fd], &timeout);
+	COMMTIMEOUTS timeout;
+	GetCommTimeouts( handles[fd], &timeout );
 	timeout.ReadIntervalTimeout = 250;
 	timeout.ReadTotalTimeoutMultiplier = 1;
 	timeout.ReadTotalTimeoutConstant = 500;
 	timeout.WriteTotalTimeoutConstant = 2500;
 	timeout.WriteTotalTimeoutMultiplier = 1;
-	SetCommTimeouts(handles[fd], &timeout);
+	SetCommTimeouts( handles[fd], &timeout );
 
 	return fd;
 }
