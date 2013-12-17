@@ -11,8 +11,12 @@
 int main( void )
 {
 	int wcDevice;
+#ifdef _WIN32
+	wcDevice = WCIO_open( "\\\\.\\COM1" );
+#else
 	wcDevice = WCIO_open( "/dev/ttyACM0" );
-	if( !wcDevice )
+#endif
+	if( wcDevice < 0 )
 	{
 		fprintf( stderr, "Cannot open connection\n" );
 		exit( 1 );

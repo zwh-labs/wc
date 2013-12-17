@@ -1,4 +1,5 @@
 #include <wc/WCPacket.h>
+#include <errno.h>
 #include <windows.h>
 
 
@@ -22,11 +23,17 @@ int WCIO_open( const char * file )
 {
 	int fd = getFreeHandleIndex();
 	if( fd < 0 )
+	{
+		errno = EMFILE;
 		return -1;
+	}
 
 	handles[fd] = CreateFile( file, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, NULL );
 	if( handles[fd] == INVALID_HANDLE_VALUE )
+	{
+		//TODO: map GetLastError to errno
 		return -1; // CreateFile failed
+	}
 
 	//TODO: check this
 	COMMCONFIG cfg;
