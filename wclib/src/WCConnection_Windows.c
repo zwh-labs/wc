@@ -61,7 +61,7 @@ WCConnection * WCConnection_open( const char * file )
 
 int WCConnection_close( WCConnection * connection )
 {
-	BOOL ret = CloseHandle( connection->handle )
+	BOOL ret = CloseHandle( connection->handle );
 	free( connection );
 	if( ret )
 		return 0;

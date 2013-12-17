@@ -8,6 +8,8 @@
 *.map
 *.sym
 *.cmake
+*.dll
+*.a
 CMakeCache.txt
 CMakeFiles/
 wclib/Makefile
