@@ -16,7 +16,7 @@ int WCIO_Unix_close( int fd )
 }
 
 
-int WCIO_Unix_read( int fd, void * buffer )
+int WCIO_Unix_read( int fd, WCPacket * buffer )
 {
 	int ret;
 	WCPacket_Header * header = (WCPacket_Header*)buffer;
@@ -35,7 +35,7 @@ int WCIO_Unix_read( int fd, void * buffer )
 }
 
 
-int WCIO_Unix_write( int fd, const void * buffer )
+int WCIO_Unix_write( int fd, const WCPacket * buffer )
 {
 	WCPacket_Header * header = (WCPacket_Header*)buffer;
 	return write( fd, buffer, header->length + sizeof(WCPacket_Header) );

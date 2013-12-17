@@ -53,7 +53,7 @@ typedef struct
 #pragma pack(pop)
 
 
-uint16_t WCPacket_size( WCPacket_Header * packet );
+uint16_t WCPacket_size( const WCPacket * packet );
 
 void WCPacket_Message_create( WCPacket_Message * message, const char * string );
 void WCPacket_Wheel_create( WCPacket_Wheel * wheel, uint8_t channel, uint8_t error, int16_t value );

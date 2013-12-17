@@ -3,9 +3,9 @@
 #include <string.h>
 
 
-uint16_t WCPacket_size( WCPacket_Header * packet )
+uint16_t WCPacket_size( const WCPacket * packet )
 {
-	return sizeof(WCPacket_Header) + (uint16_t)(packet->length);
+	return sizeof(WCPacket_Header) + (uint16_t)(packet->header.length);
 }
 
 

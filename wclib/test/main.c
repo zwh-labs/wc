@@ -20,11 +20,11 @@ int main( void )
 
 	uint8_t buffer[WCPACKET_MAXSIZE];
 	WCPacket_RequestInfo_create( (WCPacket_RequestInfo*)buffer );
-	WCIO_Unix_write( wcDevice, buffer );
+	WCIO_Unix_write( wcDevice, (const WCPacket*)buffer );
 	while( 1 )
 	{
 		WCPacket_Header * header = (WCPacket_Header*)buffer;
-		WCIO_Unix_read( wcDevice, buffer );
+		WCIO_Unix_read( wcDevice, (WCPacket*)buffer );
 		switch( header->type )
 		{
 			case WCPACKET_MESSAGE_TYPE:

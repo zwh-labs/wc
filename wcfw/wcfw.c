@@ -108,7 +108,7 @@ void CDC_Task(void)
 	// write message if available
 	if( message.header.length )
 	{
-		Endpoint_Write_Stream_LE( &message, WCPacket_size((WCPacket_Header*)&message), NULL );
+		Endpoint_Write_Stream_LE( &message, WCPacket_size((const WCPacket*)&message), NULL );
 		message.header.length = 0; // empty message, so we won't send the same message again
 	}
 
@@ -117,7 +117,7 @@ void CDC_Task(void)
 	uint8_t error = IncRotDec_retrieve( &incRotDec, &value );
 	WCPacket_Wheel wheel;
 	WCPacket_Wheel_create( &wheel, 0, error, value );
-	Endpoint_Write_Stream_LE( &wheel, WCPacket_size((WCPacket_Header*)&wheel), NULL );
+	Endpoint_Write_Stream_LE( &wheel, WCPacket_size((const WCPacket*)&wheel), NULL );
 
 	// clear
 	bool isFull = (Endpoint_BytesInEndpoint() == CDC_TXRX_EPSIZE);
@@ -138,14 +138,14 @@ void CDC_Task(void)
 		ret = Endpoint_Read_Stream_LE( buffer, sizeof(WCPacket_Header), NULL );
 		if( ret == ENDPOINT_RWSTREAM_NoError )
 		{
-			WCPacket_Header * header = (WCPacket_Header*)buffer;
-			if( (sizeof(WCPacket_Header) + header->length) > WCPACKET_MAXSIZE )
+			WCPacket * packet = (WCPacket*)buffer;
+			if( (sizeof(WCPacket_Header) + packet->header.length) > WCPACKET_MAXSIZE )
 			{
-				Endpoint_Discard_Stream( header->length, NULL );
+				Endpoint_Discard_Stream( packet->header.length, NULL );
 			}
 			else
 			{
-				ret = Endpoint_Read_Stream_LE( buffer + sizeof(WCPacket_Header), header->length, NULL );
+				ret = Endpoint_Read_Stream_LE( buffer + sizeof(WCPacket_Header), packet->header.length, NULL );
 				if( ret == ENDPOINT_RWSTREAM_NoError )
 					interpretPacket( (const WCPacket*)buffer );
 			}
