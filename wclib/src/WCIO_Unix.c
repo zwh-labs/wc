@@ -1,22 +1,21 @@
-#include <wc/WCIO_Unix.h>
 #include <wc/WCPacket.h>
 #include <unistd.h>
 #include <fcntl.h>
 
 
-int WCIO_Unix_open( const char * file )
+int WCIO_open( const char * file )
 {
 	return open( file, O_RDWR | O_NOCTTY );
 }
 
 
-int WCIO_Unix_close( int fd )
+int WCIO_close( int fd )
 {
 	return close( fd );
 }
 
 
-int WCIO_Unix_read( int fd, WCPacket * buffer )
+int WCIO_read( int fd, WCPacket * buffer )
 {
 	int ret;
 	WCPacket_Header * header = (WCPacket_Header*)buffer;
@@ -35,7 +34,7 @@ int WCIO_Unix_read( int fd, WCPacket * buffer )
 }
 
 
-int WCIO_Unix_write( int fd, const WCPacket * buffer )
+int WCIO_write( int fd, const WCPacket * buffer )
 {
 	WCPacket_Header * header = (WCPacket_Header*)buffer;
 	return write( fd, buffer, header->length + sizeof(WCPacket_Header) );
