@@ -1,5 +1,5 @@
 #include <wc/WCPacket.h>
-#include <wc/WCIO.h>
+#include <wc/WCConnection.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,13 +10,13 @@
 
 int main( void )
 {
-	int wcDevice;
+	WCConnection * connection;
 #ifdef _WIN32
-	wcDevice = WCIO_open( "\\\\.\\COM1" );
+	connection = WCConnection_open( "\\\\.\\COM1" );
 #else
-	wcDevice = WCIO_open( "/dev/ttyACM0" );
+	connection = WCConnection_open( "/dev/ttyACM0" );
 #endif
-	if( wcDevice < 0 )
+	if( connection == NULL )
 	{
 		fprintf( stderr, "Cannot open connection\n" );
 		exit( 1 );
@@ -24,11 +24,11 @@ int main( void )
 
 	uint8_t buffer[WCPACKET_MAXSIZE];
 	WCPacket_RequestInfo_create( (WCPacket_RequestInfo*)buffer );
-	WCIO_write( wcDevice, (const WCPacket*)buffer );
+	WCConnection_write( connection, (const WCPacket*)buffer );
 	while( 1 )
 	{
 		WCPacket_Header * header = (WCPacket_Header*)buffer;
-		WCIO_read( wcDevice, (WCPacket*)buffer );
+		WCConnection_read( connection, (WCPacket*)buffer );
 		switch( header->type )
 		{
 			case WCPACKET_MESSAGE_TYPE:
@@ -52,6 +52,6 @@ int main( void )
 		}
 	}
 
-	WCIO_close( wcDevice );
+	WCConnection_close( connection );
 	return 0;
 }

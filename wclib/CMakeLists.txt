@@ -6,7 +6,7 @@ add_subdirectory( test )
 
 set( wc_sources
 	src/WCPacket.c
-	src/WCIO.c
+	src/WCConnection.c
 )
 
 set( wc_include_dirs

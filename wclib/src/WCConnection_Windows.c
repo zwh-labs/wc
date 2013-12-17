@@ -3,42 +3,27 @@
 #include <windows.h>
 
 
-#define MAXHANDLES 64
-
-static HANDLE handles[MAXHANDLES] = {INVALID_HANDLE_VALUE};
-
-
-static int getFreeHandleIndex(void)
+typedef struct WCConnection
 {
-	for( int i=0; i<MAXHANDLES; i++ )
-	{
-		if( handles[i] == INVALID_HANDLE_VALUE )
-			return i;
-	}
-	return -1;
-}
+	HANDLE handle;
+} WCConnection;
 
 
-int WCIO_open( const char * file )
+WCConnection * WCConnection_open( const char * file )
 {
-	int fd = getFreeHandleIndex();
-	if( fd < 0 )
-	{
-		errno = EMFILE;
-		return -1;
-	}
+	WCConnection * connection = (WCConnection*) malloc( sizeof(WCConnection) );
 
-	handles[fd] = CreateFile( file, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, NULL );
-	if( handles[fd] == INVALID_HANDLE_VALUE )
+	connection->handle = CreateFile( file, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, NULL );
+	if( connection->handle == INVALID_HANDLE_VALUE )
 	{
-		//TODO: map GetLastError to errno
-		return -1; // CreateFile failed
+		free( connection );
+		return NULL;
 	}
 
 	//TODO: check this
 	COMMCONFIG cfg;
 	DWORD cfgSize = sizeof(COMMCONFIG);
-	GetCommConfig( handles[fd], &cfg, &cfgSize );
+	GetCommConfig( connection->handle, &cfg, &cfgSize );
 	cfg.dcb.BaudRate = 115200;
 	cfg.dcb.fBinary = TRUE;
 	cfg.dcb.fParity = FALSE;
@@ -58,35 +43,37 @@ int WCIO_open( const char * file )
 	cfg.dcb.ByteSize = 8;
 	cfg.dcb.Parity = NOPARITY;
 	cfg.dcb.StopBits = ONESTOPBIT;
-	SetCommConfig( handles[fd], &cfg, cfgSize );
+	SetCommConfig( connection->handle, &cfg, cfgSize );
 
 	//TODO: check this
 	COMMTIMEOUTS timeout;
-	GetCommTimeouts( handles[fd], &timeout );
+	GetCommTimeouts( connection->handle, &timeout );
 	timeout.ReadIntervalTimeout = 250;
 	timeout.ReadTotalTimeoutMultiplier = 1;
 	timeout.ReadTotalTimeoutConstant = 500;
 	timeout.WriteTotalTimeoutConstant = 2500;
 	timeout.WriteTotalTimeoutMultiplier = 1;
-	SetCommTimeouts( handles[fd], &timeout );
+	SetCommTimeouts( connection->handle, &timeout );
 
-	return fd;
+	return connection;
 }
 
 
-int WCIO_close( int fd )
+int WCConnection_close( WCConnection * connection )
 {
-	if( CloseHandle( handles[fd] ) )
+	BOOL ret = CloseHandle( connection->handle )
+	free( connection );
+	if( ret )
 		return 0;
 	else
 		return -1;
 }
 
 
-int WCIO_read( int fd, WCPacket * buffer )
+int WCConnection_read( WCConnection * connection, WCPacket * buffer )
 {
 	DWORD read = 0;
-	BOOL ret = ReadFile( handles[fd], buffer, sizeof(WCPacket_Header), &read, NULL);
+	BOOL ret = ReadFile( connection->handle, buffer, sizeof(WCPacket_Header), &read, NULL);
 	if( !ret )
 		return -1;
 	if( read != sizeof(WCPacket_Header) )
@@ -94,7 +81,7 @@ int WCIO_read( int fd, WCPacket * buffer )
 
 	WCPacket_Header * header = (WCPacket_Header*)buffer;
 	read = 0;
-	ret = ReadFile( handles[fd], ((char*)buffer) + sizeof(WCPacket_Header), header->length, &read, NULL);
+	ret = ReadFile( connection->handle, ((char*)buffer) + sizeof(WCPacket_Header), header->length, &read, NULL);
 	if( !ret )
 		return -1;
 	else
@@ -102,11 +89,11 @@ int WCIO_read( int fd, WCPacket * buffer )
 }
 
 
-int WCIO_write( int fd, const WCPacket * buffer )
+int WCConnection_write( WCConnection * connection, const WCPacket * buffer )
 {
 	WCPacket_Header * header = (WCPacket_Header*)buffer;
 	DWORD written = 0;
-	BOOL ret = WriteFile( handles[fd], buffer, header->length + sizeof(WCPacket_Header), &written, NULL);
+	BOOL ret = WriteFile( connection->handle, buffer, header->length + sizeof(WCPacket_Header), &written, NULL);
 	if( !ret )
 		return -1;
 	else
