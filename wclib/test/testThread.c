@@ -1,0 +1,45 @@
+#include <wc/WCConnection.h>
+#include <wc/WCThread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+
+int main( void )
+{
+	WCConnection * connection;
+#ifdef _WIN32
+	connection = WCConnection_open( "\\\\.\\COM1" );
+#else
+	connection = WCConnection_open( "/dev/ttyACM0" );
+#endif
+	if( connection == NULL )
+	{
+		fprintf( stderr, "Cannot open connection\n" );
+		exit( 1 );
+	}
+
+	WCThread * thread = WCThread_start( connection );
+
+	if( thread == NULL )
+	{
+		fprintf( stderr, "Cannot start thread on connection\n" );
+		exit( 1 );
+	}
+
+	int cnt = 0;
+	while( cnt < 5 )
+	{
+		sleep( 1 );
+		for( int i = 0; i<WCThread_getWheelCount( thread ); i++ )
+		{
+			printf( "Wheel %d: %d\n", i, WCThread_retrieveWheel( thread, i ) );
+		}
+		cnt++;
+	}
+	
+	WCThread_stop( thread );
+
+	WCConnection_close( connection );
+	return 0;
+}

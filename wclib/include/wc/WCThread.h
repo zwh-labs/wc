@@ -2,9 +2,16 @@
 #define _WCTHREAD_H_
 
 
-int WCThread_start( int fd );
-int WCThread_stop();
-int WCThread_getWheel( int channel );
+#include <wc/WCConnection.h>
+
+
+typedef struct WCThread WCThread;
+
+
+WCThread * WCThread_start( WCConnection * connection );
+int WCThread_stop( WCThread * thread );
+int WCThread_retrieveWheel( WCThread * thread, int channel );
+int WCThread_getWheelCount( WCThread * thread );
 
 
 #endif

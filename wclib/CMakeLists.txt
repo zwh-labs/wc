@@ -7,6 +7,7 @@ add_subdirectory( test )
 set( wc_sources
 	src/WCPacket.c
 	src/WCConnection.c
+	src/WCThread.c
 )
 
 set( wc_include_dirs
@@ -17,6 +18,7 @@ set( wc_library_dirs
 )
 
 set( wc_libraries
+	pthread
 )
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic" )
