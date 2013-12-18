@@ -2,6 +2,8 @@ cmake_minimum_required( VERSION 2.6 )
 cmake_policy( SET CMP0015 NEW )
 project( wc )
 
+find_package( Threads )
+
 add_subdirectory( test )
 
 set( wc_sources
@@ -18,7 +20,7 @@ set( wc_library_dirs
 )
 
 set( wc_libraries
-	pthread
+	${CMAKE_THREAD_LIBS_INIT}
 )
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic" )
