@@ -35,11 +35,11 @@ void handleWheel( WCThread * thread, WCPacket_Wheel * wheel )
 		thread->wheels[wheel->channel] = 0;
 	}
 	thread->wheels[wheel->channel] += wheel->value;
-	ReleaseMutex( thread->wheelsMutex )
+	ReleaseMutex( thread->wheelsMutex );
 }
 
 
-static DWORD connectionThread( LPVOID data )
+static DWORD WINAPI connectionThread( LPVOID data )
 {
 	WCThread * thread = (WCThread*) data;
 	bool shutdown = false;
@@ -50,7 +50,7 @@ static DWORD connectionThread( LPVOID data )
 		
 		WaitForSingleObject( thread->connectionMutex, INFINITE );
 		WCConnection_read( thread->connection, (WCPacket*)buffer );
-		ReleaseMutex( thread->connectionMutex )
+		ReleaseMutex( thread->connectionMutex );
 		
 		switch( header->type )
 		{
@@ -79,7 +79,7 @@ static DWORD connectionThread( LPVOID data )
 		shutdown = thread->shutdown;
 		ReleaseMutex( thread->shutdownMutex );
 	}
-	return NULL;
+	return 0;
 }
 
 
@@ -108,7 +108,7 @@ WCThread * WCThread_start( WCConnection * connection )
 		connectionThread,
 		thread,     // no thread function arguments
 		0,          // default creation flags
-		&thread->threadID); // receive thread identifier
+		&(thread->threadID) ); // receive thread identifier
 	
 	if( !thread->thread )
 	{
@@ -127,7 +127,7 @@ int WCThread_stop( WCThread * thread )
 {
 	WaitForSingleObject( thread->shutdownMutex, INFINITE );
 	thread->shutdown = true;
-	ReleaseMutex( thread->shutdownMutex )
+	ReleaseMutex( thread->shutdownMutex );
 
 	WaitForSingleObject( thread->thread, INFINITE );
 	CloseHandle( thread->connectionMutex );
@@ -148,7 +148,7 @@ int WCThread_retrieveWheel( WCThread * thread, int channel )
 		wheel = thread->wheels[channel];
 		thread->wheels[channel] = 0;
 	}
-	ReleaseMutex( thread->wheelsMutex )
+	ReleaseMutex( thread->wheelsMutex );
 	return wheel;
 }
 
@@ -158,6 +158,6 @@ int WCThread_getWheelCount( WCThread * thread )
 	int wheelCount = 0;
 	WaitForSingleObject( thread->wheelsMutex, INFINITE );
 	wheelCount = thread->numWheels;
-	ReleaseMutex( thread->wheelsMutex )
+	ReleaseMutex( thread->wheelsMutex );
 	return wheelCount;
 }

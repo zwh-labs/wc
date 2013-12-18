@@ -5,6 +5,15 @@
 #include <unistd.h>
 
 
+#ifdef _WIN32
+#include <windows.h>
+void sleep( int sec )
+{
+	Sleep( sec * 1000 );
+}
+#endif
+
+
 int main( void )
 {
 	WCConnection * connection;
