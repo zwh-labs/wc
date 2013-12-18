@@ -5,10 +5,11 @@ git:
 
 before_install:
  - sudo apt-get update -qq
+ - sudo apt-get install gcc-avr avr-libc
 
-script: 
-- cd wclib
-- cmake . && make
+script:
+- (cd wclib && cmake . && make)
+- (cd wcfw && make)
 
 notifications:
   irc:
