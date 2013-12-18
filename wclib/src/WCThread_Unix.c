@@ -1,4 +1,5 @@
 #include <wc/WCConnection.h>
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -100,7 +101,7 @@ WCThread * WCThread_start( WCConnection * connection )
 
 	if( pthread_create( &(thread->thread), NULL, connectionThread, thread ) != 0 )
 	{
-		fprintf( stderr, "pthread_create init failed\n" );
+		fprintf( stderr, "pthread_create failed\n" );
 		pthread_mutex_destroy( &(thread->connectionMutex) );
 		pthread_mutex_destroy( &(thread->wheelsMutex) );
 		pthread_mutex_destroy( &(thread->shutdownMutex) );
@@ -110,7 +111,7 @@ WCThread * WCThread_start( WCConnection * connection )
 	return thread;
 
 pthread_mutex_init_failed:
-	fprintf( stderr, "pthread_mutex_init init failed\n" );
+	fprintf( stderr, "pthread_mutex_init failed\n" );
 	free( thread );
 	return NULL;
 }
