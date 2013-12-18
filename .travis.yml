@@ -1,0 +1,18 @@
+language: c
+
+git:
+  depth: 1
+
+before_install:
+ - sudo apt-get update -qq
+
+script: 
+- cd wclib
+- cmake . && make
+
+notifications:
+  irc:
+    channels:
+      - "irc.euirc.net#hswgt.ai"
+    use_notice: true
+    skip_join: true
