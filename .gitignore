@@ -16,5 +16,5 @@ CMakeFiles/
 wclib/Makefile
 wclib/bin/
 wclib/lib/
-wclib/test/Makefile
+wclib/examples/Makefile
 build/

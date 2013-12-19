@@ -48,8 +48,8 @@ WCConnection * WCConnection_open( const char * file )
 	//TODO: check this
 	COMMTIMEOUTS timeout;
 	GetCommTimeouts( connection->handle, &timeout );
-	timeout.ReadIntervalTimeout = MAXDWORD;
-	timeout.ReadTotalTimeoutMultiplier = MAXDWORD;
+	timeout.ReadIntervalTimeout = 500;
+	timeout.ReadTotalTimeoutMultiplier = 1;
 	timeout.ReadTotalTimeoutConstant = 1000;
 	timeout.WriteTotalTimeoutConstant = 1000;
 	timeout.WriteTotalTimeoutMultiplier = 1;
