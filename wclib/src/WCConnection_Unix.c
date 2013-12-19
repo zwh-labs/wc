@@ -36,7 +36,7 @@ WCConnection * WCConnection_open( const char * file )
 	connection->tio.c_cc[VMIN] = 1;
 	tcflush( connection->fd, TCIFLUSH );
 	tcsetattr( connection->fd, TCSANOW, &connection->tio );
-	
+
 	return connection;
 }
 

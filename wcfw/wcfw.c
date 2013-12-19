@@ -8,6 +8,7 @@
 #include "USBDescriptors.h"
 
 #include <wc/WCPacket.h>
+#include <wc/WCError.h>
 
 #include <LUFA/Drivers/Board/LEDs.h>
 #include <LUFA/Drivers/USB/USB.h>
@@ -116,7 +117,7 @@ void CDC_Task(void)
 	int16_t value = 0;
 	uint8_t error = IncRotDec_retrieve( &incRotDec, &value );
 	WCPacket_Wheel wheel;
-	WCPacket_Wheel_create( &wheel, 0, error, value );
+	WCPacket_Wheel_create( &wheel, 0, error?WCERROR_WHEELSIGNAL:WCERROR_NOERROR, value );
 	Endpoint_Write_Stream_LE( &wheel, WCPacket_size((const WCPacket*)&wheel), NULL );
 
 	// clear

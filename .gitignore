@@ -10,9 +10,11 @@
 *.cmake
 *.dll
 *.a
+*.kdev4
 CMakeCache.txt
 CMakeFiles/
 wclib/Makefile
 wclib/bin/
 wclib/lib/
 wclib/test/Makefile
+build/

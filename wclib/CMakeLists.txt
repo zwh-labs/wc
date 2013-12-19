@@ -4,12 +4,14 @@ project( wc )
 
 find_package( Threads )
 
-add_subdirectory( test )
+add_subdirectory( examples )
 
 set( wc_sources
 	src/WCPacket.c
 	src/WCConnection.c
 	src/WCThread.c
+	src/WCConfiguration.c
+	src/WCConfigurationArgumentParser.c
 )
 
 set( wc_include_dirs
@@ -29,5 +31,5 @@ link_directories( ${wc_library_dirs} )
 include_directories( ${wc_include_dirs} )
 
 add_library( wc SHARED ${wc_sources} )
-set_target_properties( wc PROPERTIES LIBRARY_OUTPUT_DIRECTORY lib )
+set_target_properties( wc PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
 target_link_libraries( wc ${wc_libraries} )
