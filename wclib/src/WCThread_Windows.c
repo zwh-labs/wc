@@ -27,14 +27,14 @@ typedef struct WCThread
 void handleWheel( WCThread * thread, WCPacket_Wheel * wheel )
 {
 	WaitForSingleObject( thread->wheelsMutex, INFINITE );
-	if( thread->numWheels <= wheel->channel )
-	{
-		fprintf( stderr, "Resizing number of tracked channels from %d to %d\n", thread->numWheels, wheel->channel + 1 );
-		thread->wheels = realloc( thread->wheels, sizeof(int) * (wheel->channel + 1) );
-		thread->numWheels = wheel->channel + 1;
-		thread->wheels[wheel->channel] = 0;
-	}
-	thread->wheels[wheel->channel] += wheel->value;
+		if( thread->numWheels <= wheel->channel )
+		{
+			fprintf( stderr, "Resizing number of tracked channels from %d to %d\n", thread->numWheels, wheel->channel + 1 );
+			thread->wheels = realloc( thread->wheels, sizeof(int) * (wheel->channel + 1) );
+			thread->numWheels = wheel->channel + 1;
+			thread->wheels[wheel->channel] = 0;
+		}
+		thread->wheels[wheel->channel] += wheel->value;
 	ReleaseMutex( thread->wheelsMutex );
 }
 
@@ -49,7 +49,7 @@ static DWORD WINAPI connectionThread( LPVOID data )
 		WCPacket_Header * header = (WCPacket_Header*)buffer;
 		
 		WaitForSingleObject( thread->connectionMutex, INFINITE );
-		WCConnection_read( thread->connection, (WCPacket*)buffer );
+			WCConnection_read( thread->connection, (WCPacket*)buffer );
 		ReleaseMutex( thread->connectionMutex );
 		
 		switch( header->type )
@@ -76,7 +76,7 @@ static DWORD WINAPI connectionThread( LPVOID data )
 		}
 		
 		WaitForSingleObject( thread->shutdownMutex, INFINITE );
-		shutdown = thread->shutdown;
+			shutdown = thread->shutdown;
 		ReleaseMutex( thread->shutdownMutex );
 	}
 	return 0;
@@ -126,7 +126,7 @@ WCThread * WCThread_start( WCConnection * connection )
 int WCThread_stop( WCThread * thread )
 {
 	WaitForSingleObject( thread->shutdownMutex, INFINITE );
-	thread->shutdown = true;
+		thread->shutdown = true;
 	ReleaseMutex( thread->shutdownMutex );
 
 	WaitForSingleObject( thread->thread, INFINITE );
@@ -143,11 +143,11 @@ int WCThread_retrieveWheel( WCThread * thread, int channel )
 {
 	int wheel = 0;
 	WaitForSingleObject( thread->wheelsMutex, INFINITE );
-	if( channel >= 0 && channel < thread->numWheels )
-	{
-		wheel = thread->wheels[channel];
-		thread->wheels[channel] = 0;
-	}
+		if( channel >= 0 && channel < thread->numWheels )
+		{
+			wheel = thread->wheels[channel];
+			thread->wheels[channel] = 0;
+		}
 	ReleaseMutex( thread->wheelsMutex );
 	return wheel;
 }
@@ -157,7 +157,7 @@ int WCThread_getWheelCount( WCThread * thread )
 {
 	int wheelCount = 0;
 	WaitForSingleObject( thread->wheelsMutex, INFINITE );
-	wheelCount = thread->numWheels;
+		wheelCount = thread->numWheels;
 	ReleaseMutex( thread->wheelsMutex );
 	return wheelCount;
 }

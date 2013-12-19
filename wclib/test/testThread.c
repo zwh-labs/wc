@@ -30,11 +30,15 @@ int main( void )
 
 	WCThread * thread = WCThread_start( connection );
 
+	fprintf( stderr, "Starting thread\n" );
+
 	if( thread == NULL )
 	{
 		fprintf( stderr, "Cannot start thread on connection\n" );
 		exit( 1 );
 	}
+
+	fprintf( stderr, "Started thread\n" );
 
 	int cnt = 0;
 	while( cnt < 5 )
@@ -47,7 +51,11 @@ int main( void )
 		cnt++;
 	}
 	
+	fprintf( stderr, "Stopping thread\n" );
+
 	WCThread_stop( thread );
+
+	fprintf( stderr, "Stopped thread\n" );
 
 	WCConnection_close( connection );
 	return 0;
