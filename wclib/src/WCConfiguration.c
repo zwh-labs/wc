@@ -3,6 +3,16 @@
 #include <stdio.h>
 
 
+#define DEFAULT_WHEELINCREMENTSPERTURN (1024)
+#define DEFAULT_WHEELDIAMETER           (1.0)
+
+#ifdef _WIN32
+	#define DEFAULT_DEVICEPATH "\\\\.\\COM1"
+#else
+	#define DEFAULT_DEVICEPATH "/dev/ttyACM0"
+#endif
+
+
 typedef struct WCConfigurationWheel
 {
 	unsigned int incrementsPerTurn;
@@ -32,12 +42,16 @@ unsigned int WCConfiguration_getWheelCount( const WCConfiguration * configuratio
 
 unsigned int WCConfiguration_getWheelIncrementsPerTurn( const WCConfiguration * configuration, unsigned int wheelIndex )
 {
+	if( wheelIndex >= configuration->wheelCount )
+		return DEFAULT_WHEELINCREMENTSPERTURN;
 	return configuration->wheelConfigurations[wheelIndex].incrementsPerTurn;
 }
 
 
 double WCConfiguration_getWheelDiameter( const WCConfiguration * configuration, unsigned int wheelIndex )
 {
+	if( wheelIndex >= configuration->wheelCount )
+		return DEFAULT_WHEELDIAMETER;
 	return configuration->wheelConfigurations[wheelIndex].wheelDiameter;
 }
 
@@ -79,12 +93,7 @@ WCConfiguration * WCConfiguration_new()
 	WCConfiguration * configuration = malloc( sizeof(WCConfiguration) );
 	memset( configuration, 0, sizeof(WCConfiguration) );
 
-#ifdef _WIN32
-	WCConfiguration_setDevicePath( configuration, "\\\\.\\COM1" );
-#else
-	WCConfiguration_setDevicePath( configuration, "/dev/ttyACM0" );
-#endif
-
+	WCConfiguration_setDevicePath( configuration, DEFAULT_DEVICEPATH );
 	configuration->wheelCount = 0;
 
 	return configuration;
