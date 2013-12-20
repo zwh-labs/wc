@@ -65,18 +65,17 @@ static ssize_t readBytes( int fd, void * buffer, size_t length )
 }
 
 
-int WCConnection_read( WCConnection * connection, WCPacket * buffer )
+int WCConnection_read( WCConnection * connection, WCPacket * packet )
 {
 	int ret;
-	WCPacket_Header * header = (WCPacket_Header*)buffer;
 
 	// header
-	ret = readBytes( connection->fd, buffer, sizeof(WCPacket_Header) );
+	ret = readBytes( connection->fd, &(packet->header), sizeof(WCPacket_Header) );
 	if( ret != sizeof(WCPacket_Header) )
 		return ret; // return error or size read
 
 	// remaining packet
-	ret = readBytes( connection->fd, ((char*)buffer) + sizeof(WCPacket_Header), header->length );
+	ret = readBytes( connection->fd, packet->_data, packet->header.length );
 	if( ret < 0 )
 		return ret; // return error
 	else
@@ -84,8 +83,7 @@ int WCConnection_read( WCConnection * connection, WCPacket * buffer )
 }
 
 
-int WCConnection_write( WCConnection * connection, const WCPacket * buffer )
+int WCConnection_write( WCConnection * connection, const WCPacket * packet )
 {
-	WCPacket_Header * header = (WCPacket_Header*)buffer;
-	return write( connection->fd, buffer, header->length + sizeof(WCPacket_Header) );
+	return write( connection->fd, packet, WCPacket_size( packet ) );
 }

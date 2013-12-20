@@ -1,7 +1,8 @@
 #include <wc/WCConfiguration.h>
-#include <wc/WCConfigurationArgumentParser.h>
+#include <wc/WCConfiguration_ArgumentParser.h>
 #include <wc/WCConnection.h>
 #include <wc/WCThread.h>
+#include <wc/WCWheelMovement.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -38,7 +39,8 @@ int main( int argc, const char ** argv )
 		sleep( 1 );
 		for( int i = 0; i<WCThread_getWheelCount( thread ); i++ )
 		{
-			printf( "Wheel %d: %d\n", i, WCThread_retrieveWheel( thread, i ) );
+			WCWheelMovement wm = WCThread_retrieveWheelMovement( thread, i );
+			printf( "Wheel:\tchannel=%d\terror=%d\tvalue=%d\n", i, WCWheelMovement_getError( &wm ), WCWheelMovement_getIncrements( &wm ) );
 		}
 		cnt++;
 	}

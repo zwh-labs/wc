@@ -5,6 +5,7 @@
 
 
 #define WCPACKET_MAXSIZE 255
+#define WCPACKET_MAXLENGTH ( WCPACKET_MAXSIZE - sizeof(WCPacket_Header) )
 
 #define WCPACKET_MESSAGE_TYPE      0
 #define WCPACKET_MESSAGE_MAXLENGTH ( WCPACKET_MAXSIZE - sizeof(WCPacket_Header) )
@@ -28,10 +29,14 @@ typedef struct
 typedef struct
 {
 	WCPacket_Header header;
+	uint8_t _data[WCPACKET_MAXLENGTH];
 } WCPacket;
 
 
-typedef WCPacket WCPacket_RequestInfo;
+typedef struct
+{
+	WCPacket_Header header;
+} WCPacket_RequestInfo;
 
 
 typedef struct

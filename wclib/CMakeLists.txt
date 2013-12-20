@@ -10,8 +10,11 @@ set( wc_sources
 	src/WCPacket.c
 	src/WCConnection.c
 	src/WCThread.c
+	src/WCThread_Mutex.c
+	src/WCThread_Thread.c
 	src/WCConfiguration.c
-	src/WCConfigurationArgumentParser.c
+	src/WCConfiguration_ArgumentParser.c
+	src/WCWheelMovement_Configuration.c
 )
 
 set( wc_include_dirs
@@ -32,4 +35,6 @@ include_directories( ${wc_include_dirs} )
 
 add_library( wc SHARED ${wc_sources} )
 set_target_properties( wc PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
+set_target_properties( wc PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
+set_target_properties( wc PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
 target_link_libraries( wc ${wc_libraries} )

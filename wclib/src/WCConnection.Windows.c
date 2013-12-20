@@ -70,18 +70,17 @@ int WCConnection_close( WCConnection * connection )
 }
 
 
-int WCConnection_read( WCConnection * connection, WCPacket * buffer )
+int WCConnection_read( WCConnection * connection, WCPacket * packet )
 {
 	DWORD read = 0;
-	BOOL ret = ReadFile( connection->handle, buffer, sizeof(WCPacket_Header), &read, NULL);
+	BOOL ret = ReadFile( connection->handle, &(packet->header), sizeof(WCPacket_Header), &read, NULL);
 	if( !ret )
 		return -1;
 	if( read != sizeof(WCPacket_Header) )
 		return read;
 
-	WCPacket_Header * header = (WCPacket_Header*)buffer;
 	read = 0;
-	ret = ReadFile( connection->handle, ((char*)buffer) + sizeof(WCPacket_Header), header->length, &read, NULL);
+	ret = ReadFile( connection->handle, packet->_data, packet->header.length, &read, NULL);
 	if( !ret )
 		return -1;
 	else
@@ -89,11 +88,10 @@ int WCConnection_read( WCConnection * connection, WCPacket * buffer )
 }
 
 
-int WCConnection_write( WCConnection * connection, const WCPacket * buffer )
+int WCConnection_write( WCConnection * connection, const WCPacket * packet )
 {
-	WCPacket_Header * header = (WCPacket_Header*)buffer;
 	DWORD written = 0;
-	BOOL ret = WriteFile( connection->handle, buffer, header->length + sizeof(WCPacket_Header), &written, NULL);
+	BOOL ret = WriteFile( connection->handle, packet, WCPacket_size( packet ), &written, NULL);
 	if( !ret )
 		return -1;
 	else

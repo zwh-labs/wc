@@ -3,6 +3,7 @@
 
 
 #include <wc/WCConnection.h>
+#include <wc/WCWheelMovement.h>
 
 
 typedef struct WCThread WCThread;
@@ -10,7 +11,7 @@ typedef struct WCThread WCThread;
 
 WCThread * WCThread_start( WCConnection * connection );
 int WCThread_stop( WCThread * thread );
-int WCThread_retrieveWheel( WCThread * thread, int channel );
+WCWheelMovement WCThread_retrieveWheelMovement( WCThread * thread, unsigned int index );
 int WCThread_getWheelCount( WCThread * thread );
 
 

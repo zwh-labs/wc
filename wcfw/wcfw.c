@@ -135,20 +135,19 @@ void CDC_Task(void)
 	if( Endpoint_IsOUTReceived() )
 	{
 		uint8_t ret;
-		uint8_t buffer[WCPACKET_MAXSIZE];
-		ret = Endpoint_Read_Stream_LE( buffer, sizeof(WCPacket_Header), NULL );
+		WCPacket packet;
+		ret = Endpoint_Read_Stream_LE( &(packet.header), sizeof(WCPacket_Header), NULL );
 		if( ret == ENDPOINT_RWSTREAM_NoError )
 		{
-			WCPacket * packet = (WCPacket*)buffer;
-			if( (sizeof(WCPacket_Header) + packet->header.length) > WCPACKET_MAXSIZE )
+			if( WCPacket_size( &packet ) > WCPACKET_MAXSIZE )
 			{
-				Endpoint_Discard_Stream( packet->header.length, NULL );
+				Endpoint_Discard_Stream( packet.header.length, NULL );
 			}
 			else
 			{
-				ret = Endpoint_Read_Stream_LE( buffer + sizeof(WCPacket_Header), packet->header.length, NULL );
+				ret = Endpoint_Read_Stream_LE( packet._data, packet.header.length, NULL );
 				if( ret == ENDPOINT_RWSTREAM_NoError )
-					interpretPacket( (const WCPacket*)buffer );
+					interpretPacket( &packet );
 			}
 		}
 		Endpoint_ClearOUT();
