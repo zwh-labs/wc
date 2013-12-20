@@ -1,5 +1,7 @@
 #include <wc/WCPacket.h>
 #include <wc/WCConnection.h>
+#include <wc/WCConfiguration.h>
+#include <wc/WCConfiguration_ArgumentParser.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,45 +10,40 @@
 #include <fcntl.h>
 
 
-int main( void )
+int main( int argc, const char ** argv )
 {
-	WCConnection * connection;
-#ifdef _WIN32
-	connection = WCConnection_open( "\\\\.\\COM1" );
-#else
-	connection = WCConnection_open( "/dev/ttyACM0" );
-#endif
-	if( connection == NULL )
-	{
-		fprintf( stderr, "Cannot open connection\n" );
-		exit( 1 );
-	}
+	WCConfiguration * configuration = WCConfiguration_newFromArguments( argc, argv );
+	if( configuration == NULL )
+		goto configuration_failed;
 
-	uint8_t buffer[WCPACKET_MAXSIZE];
-	WCPacket_RequestInfo_create( (WCPacket_RequestInfo*)buffer );
-	WCConnection_write( connection, (const WCPacket*)buffer );
+	WCConnection * connection = WCConnection_open( WCConfiguration_getDevicePath( configuration) );
+	if( connection == NULL )
+		goto connection_failed;
+
+	WCPacket packet;
+	WCPacket_RequestInfo_create( (WCPacket_RequestInfo*)&packet );
+	WCConnection_write( connection, &packet );
 	while( 1 )
 	{
-		WCPacket_Header * header = (WCPacket_Header*)buffer;
-		WCConnection_read( connection, (WCPacket*)buffer );
-		switch( header->type )
+		WCConnection_read( connection, &packet );
+		switch( packet.header.type )
 		{
 			case WCPACKET_MESSAGE_TYPE:
 			{
-				WCPacket_Message * message = (WCPacket_Message*)buffer;
+				WCPacket_Message * message = (WCPacket_Message*)&packet;
 				message->text[message->header.length] = 0;
 				fprintf( stderr, "Received message:\"%s\"\n", message->text );
 				break;
 			}
 			case WCPACKET_WHEEL_TYPE:
 			{
-				WCPacket_Wheel * wheel = (WCPacket_Wheel*)buffer;
+				WCPacket_Wheel * wheel = (WCPacket_Wheel*)&packet;
 				fprintf( stderr, "Received wheel:\tchannel=%d\terror=%d\tvalue=%d\n", wheel->channel, wheel->error, wheel->value );
 				break;
 			}
 			default:
 			{
-				fprintf( stderr, "Received unknown packet type: %d\n", header->type );
+				fprintf( stderr, "Received unknown packet type: %d\n", packet.header.type );
 				break;
 			}
 		}
@@ -54,4 +51,11 @@ int main( void )
 
 	WCConnection_close( connection );
 	return 0;
+
+connection_failed:
+	fprintf( stderr, "Cannot open connection\n" );
+	WCConfiguration_delete( configuration );
+configuration_failed:
+	fprintf( stderr, "Cannot create configuration\n" );
+	return 1;
 }
