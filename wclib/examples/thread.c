@@ -19,22 +19,28 @@ void sleep( int sec )
 
 int main( int argc, const char ** argv )
 {
+	fprintf( stderr, "Reading configuration ... " ); fflush( stderr );
 	WCConfiguration * configuration = WCConfiguration_newFromArguments( argc, argv );
-	if( configuration == NULL )
+	if( !configuration )
 		goto configuration_failed;
+	fprintf( stderr, "done\n" );
+	WCConfiguration_fprint( stderr, configuration );
 
-	WCConnection * connection = WCConnection_open( WCConfiguration_getDevicePath( configuration) );
-	if( connection == NULL )
+	fprintf( stderr, "Opening connection ... " ); fflush( stderr );
+	WCConnection * connection = WCConnection_open( WCConfiguration_getDevicePath( configuration ) );
+	if( !connection )
 		goto connection_failed;
+	fprintf( stderr, "done\n" );
 
-	fprintf( stderr, "Starting thread\n" );
+	fprintf( stderr, "Starting thread on connection ... " ); fflush( stderr );
 	WCThread * thread = WCThread_start( connection );
-	if( thread == NULL )
+	if( !thread )
 		goto thread_failed;
-	fprintf( stderr, "Started thread\n" );
+	fprintf( stderr, "done\n" );
 
+	fprintf( stderr, "Running for 10 seconds\n" );
 	int cnt = 0;
-	while( cnt < 5 )
+	while( cnt < 10 )
 	{
 		sleep( 1 );
 		for( int i = 0; i<WCThread_getWheelCount( thread ); i++ )
@@ -45,21 +51,24 @@ int main( int argc, const char ** argv )
 		cnt++;
 	}
 
-	fprintf( stderr, "Stopping thread\n" );
-	WCThread_stop( thread );
-	fprintf( stderr, "Stopped thread\n" );
+	fprintf( stderr, "Stopping thread ... " ); fflush( stderr );
+	if( !WCThread_stop( thread ) )
+		goto thread_failed;
+	fprintf( stderr, "done\n" );
 
-	WCConnection_close( connection );
+	fprintf( stderr, "Closing connection ... " ); fflush( stderr );
+	if( !WCConnection_close( connection ) )
+		goto connection_failed;
+	fprintf( stderr, "done\n" );
+
 	WCConfiguration_delete( configuration );
 	return 0;
 
 thread_failed:
-	fprintf( stderr, "Cannot start thread on connection\n" );
 	WCConnection_close( connection );
 connection_failed:
-	fprintf( stderr, "Cannot open connection\n" );
 	WCConfiguration_delete( configuration );
 configuration_failed:
-	fprintf( stderr, "Cannot create configuration\n" );
+	fprintf( stderr, "failed\n" );
 	return 1;
 }

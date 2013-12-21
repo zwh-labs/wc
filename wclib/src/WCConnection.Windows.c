@@ -1,4 +1,5 @@
 #include <wc/WCPacket.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <windows.h>
 
@@ -59,14 +60,11 @@ WCConnection * WCConnection_open( const char * file )
 }
 
 
-int WCConnection_close( WCConnection * connection )
+bool WCConnection_close( WCConnection * connection )
 {
 	BOOL ret = CloseHandle( connection->handle );
 	free( connection );
-	if( ret )
-		return 0;
-	else
-		return -1;
+	return ret;
 }
 
 

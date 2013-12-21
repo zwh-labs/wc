@@ -3,6 +3,7 @@
 
 
 #include <stdio.h>
+#include <stdbool.h>
 
 
 typedef struct WCConfiguration WCConfiguration;
@@ -14,7 +15,7 @@ unsigned int WCConfiguration_getWheelIncrementsPerTurn( const WCConfiguration * 
 double WCConfiguration_getWheelDiameter( const WCConfiguration * configuration, unsigned int wheelIndex );
 
 void WCConfiguration_setDevicePath( WCConfiguration * configuration, const char * devicePath );
-int WCConfiguration_setWheel( WCConfiguration * configuration, unsigned int wheelIndex, unsigned int incrementsPerTurn, double wheelDiameter );
+bool WCConfiguration_setWheel( WCConfiguration * configuration, unsigned int wheelIndex, unsigned int incrementsPerTurn, double wheelDiameter );
 
 void WCConfiguration_delete( WCConfiguration * configuration );
 WCConfiguration * WCConfiguration_new();

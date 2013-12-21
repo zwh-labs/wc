@@ -53,6 +53,5 @@ WCConfiguration * WCConfiguration_newFromArguments( int argc, const char ** argv
 			continue;
 		}
 	}
-	WCConfiguration_fprint( stderr, configuration );
 	return configuration;
 }

@@ -3,7 +3,7 @@
 
 
 // returns the decoded position from encoder
-static uint8_t readPosition( IncRotDec * incRotDec )
+static inline uint8_t readPosition( IncRotDec * incRotDec )
 {
 	uint8_t position = 0;
 	uint8_t input = *(incRotDec->pinRegister);

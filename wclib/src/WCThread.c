@@ -27,12 +27,12 @@ typedef struct WCThread
 } WCThread;
 
 
-void handleWheel( WCThread * thread, WCPacket_Wheel * pw )
+static void handleWheel( WCThread * thread, WCPacket_Wheel * pw )
 {
 	WCThread_Mutex_lock( thread->wheelsMutex );
 		if( thread->numWheels <= pw->channel )
 		{
-			fprintf( stderr, "Resizing number of tracked wheels from %d to %d\n", thread->numWheels, pw->channel + 1 );
+			fprintf( stderr, "Increasing number of tracked wheels from %d to %d\n", thread->numWheels, pw->channel + 1 );
 			thread->wheelMovements = realloc( thread->wheelMovements, sizeof(WCWheelMovement) * (pw->channel + 1) );
 			WCWheelMovement_createFromPacket( &(thread->wheelMovements[thread->numWheels]), pw );
 			thread->numWheels = pw->channel + 1;
@@ -123,7 +123,7 @@ WCThread * WCThread_start( WCConnection * connection )
 }
 
 
-int WCThread_stop( WCThread * thread )
+bool WCThread_stop( WCThread * thread )
 {
 	WCThread_Mutex_lock( thread->shutdownMutex );
 		thread->shutdown = true;
@@ -139,7 +139,7 @@ int WCThread_stop( WCThread * thread )
 	free( thread->wheelMovements );
 	free( thread );
 
-	return 0;
+	return true;
 }
 
 

@@ -12,13 +12,17 @@
 
 int main( int argc, const char ** argv )
 {
+	fprintf( stderr, "Reading configuration ... " ); fflush( stderr );
 	WCConfiguration * configuration = WCConfiguration_newFromArguments( argc, argv );
-	if( configuration == NULL )
+	if( !configuration )
 		goto configuration_failed;
+	fprintf( stderr, "done\n" );
 
-	WCConnection * connection = WCConnection_open( WCConfiguration_getDevicePath( configuration) );
-	if( connection == NULL )
+	fprintf( stderr, "Opening connection ... " ); fflush( stderr );
+	WCConnection * connection = WCConnection_open( WCConfiguration_getDevicePath( configuration ) );
+	if( !connection )
 		goto connection_failed;
+	fprintf( stderr, "done\n" );
 
 	WCPacket packet;
 	WCPacket_RequestInfo_create( (WCPacket_RequestInfo*)&packet );
@@ -53,9 +57,8 @@ int main( int argc, const char ** argv )
 	return 0;
 
 connection_failed:
-	fprintf( stderr, "Cannot open connection\n" );
 	WCConfiguration_delete( configuration );
 configuration_failed:
-	fprintf( stderr, "Cannot create configuration\n" );
+	fprintf( stderr, "failed\n" );
 	return 1;
 }

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -64,19 +65,19 @@ void WCConfiguration_setDevicePath( WCConfiguration * configuration, const char 
 }
 
 
-int WCConfiguration_setWheel( WCConfiguration * configuration, unsigned int wheelIndex, unsigned int incrementsPerTurn, double wheelDiameter )
+bool WCConfiguration_setWheel( WCConfiguration * configuration, unsigned int wheelIndex, unsigned int incrementsPerTurn, double wheelDiameter )
 {
 	if( wheelIndex >= configuration->wheelCount )
 	{
 		WCConfigurationWheel * newWheelConfigurations = realloc( configuration->wheelConfigurations, sizeof(WCConfigurationWheel) * (wheelIndex + 1) );
 		if( !newWheelConfigurations )
-			return -1;
+			return false;
 		configuration->wheelConfigurations = newWheelConfigurations;
 	}
 	configuration->wheelCount = wheelIndex + 1;
 	configuration->wheelConfigurations[wheelIndex].incrementsPerTurn = incrementsPerTurn;
 	configuration->wheelConfigurations[wheelIndex].wheelDiameter = wheelDiameter;
-	return 0;
+	return true;
 }
 
 
@@ -105,7 +106,8 @@ int WCConfiguration_fprint( FILE * stream, const WCConfiguration * configuration
 	int cnt = 0;
 	cnt += fprintf( stream, "Configuration %p:\n", (void*)configuration );
 	cnt += fprintf( stream, "\tdevicePath=\"%s\"\n", configuration->devicePath );
-	cnt += fprintf( stream, "\tWheels:\n" );
+	if( configuration->wheelCount )
+		cnt += fprintf( stream, "\tWheels:\n" );
 	for( unsigned int i=0; i<configuration->wheelCount; i++ )
 		cnt += fprintf( stream, "\t\t%u - %u incrementsPerTurn - %lf diameter\n", i, configuration->wheelConfigurations[i].incrementsPerTurn, configuration->wheelConfigurations[i].wheelDiameter );
 	return cnt;

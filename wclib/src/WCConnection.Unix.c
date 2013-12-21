@@ -1,4 +1,5 @@
 #include <wc/WCPacket.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -41,12 +42,12 @@ WCConnection * WCConnection_open( const char * file )
 }
 
 
-int WCConnection_close( WCConnection * connection )
+bool WCConnection_close( WCConnection * connection )
 {
 	tcsetattr( connection->fd, TCSANOW, &(connection->initialTio) );
 	int ret = close( connection->fd );
 	free( connection );
-	return ret;
+	return ret == 0;
 }
 
 

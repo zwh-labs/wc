@@ -22,13 +22,15 @@
 #include <string.h>
 
 
-static IncRotDec incRotDec;
+static IncRotDec incRotDecA;
+static IncRotDec incRotDecB;
 static WCPacket_Message message;
 
 
 ISR( TIMER1_COMPA_vect )
 {
-	IncRotDec_sample( &incRotDec );
+	IncRotDec_sample( &incRotDecA );
+	IncRotDec_sample( &incRotDecB );
 }
 
 
@@ -48,7 +50,7 @@ void timer1_init(void)
 	TCNT1 = 0;
 
 	// compare value
-	OCR1A = 20;
+	OCR1A = 32;
 
 	// enable Timer/Counter1 Output Compare A Match interrupt
 	TIMSK1 = _BV(OCIE1A);
@@ -61,13 +63,16 @@ void SetupHardware(void)
 	MCUSR &= ~(1 << WDRF);
 	wdt_disable();
 
+	JTAG_DISABLE();
+
 	// disable clock division
 	clock_prescale_set( clock_div_1 );
 
 	LEDs_Init();
 	USB_Init();
 
-	IncRotDec_init( &incRotDec, &DDRF, &PINF, &PORTF, _BV(PINF0), _BV(PINF1) );
+	IncRotDec_init( &incRotDecA, &DDRF, &PINF, &PORTF, _BV(PINF0), _BV(PINF1) );
+	IncRotDec_init( &incRotDecB, &DDRF, &PINF, &PORTF, _BV(PINF4), _BV(PINF5) );
 	timer1_init();
 }
 
@@ -115,9 +120,15 @@ void CDC_Task(void)
 
 	// write wheel counters
 	int16_t value = 0;
-	uint8_t error = IncRotDec_retrieve( &incRotDec, &value );
+	uint8_t error;
 	WCPacket_Wheel wheel;
+	// channel 0
+	error = IncRotDec_retrieve( &incRotDecA, &value );
 	WCPacket_Wheel_create( &wheel, 0, error?WCERROR_WHEELSIGNAL:WCERROR_NOERROR, value );
+	Endpoint_Write_Stream_LE( &wheel, WCPacket_size((const WCPacket*)&wheel), NULL );
+	// channel 1
+	error = IncRotDec_retrieve( &incRotDecB, &value );
+	WCPacket_Wheel_create( &wheel, 1, error?WCERROR_WHEELSIGNAL:WCERROR_NOERROR, value );
 	Endpoint_Write_Stream_LE( &wheel, WCPacket_size((const WCPacket*)&wheel), NULL );
 
 	// clear
