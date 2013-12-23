@@ -52,10 +52,20 @@ static void connectionThread( void * data )
 	while( !shutdown )
 	{
 		WCPacket packet;
+		int read;
 
 		WCThread_Mutex_lock( thread->connectionMutex );
-			WCConnection_read( thread->connection, &packet );
+			read = WCConnection_read( thread->connection, &packet );
 		WCThread_Mutex_unlock( thread->connectionMutex );
+
+		if( read <= 0)
+		{
+			fprintf( stderr, "Cannot read from connection\n" );
+			WCThread_Mutex_lock( thread->shutdownMutex );
+				thread->shutdown = true;
+			WCThread_Mutex_unlock( thread->shutdownMutex );
+			break;
+		}
 
 		switch( packet.header.type )
 		{

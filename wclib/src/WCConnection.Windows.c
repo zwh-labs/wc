@@ -21,7 +21,6 @@ WCConnection * WCConnection_open( const char * file )
 		return NULL;
 	}
 
-	//TODO: check this
 	COMMCONFIG cfg;
 	DWORD cfgSize = sizeof(COMMCONFIG);
 	GetCommConfig( connection->handle, &cfg, &cfgSize );
@@ -46,14 +45,13 @@ WCConnection * WCConnection_open( const char * file )
 	cfg.dcb.StopBits = ONESTOPBIT;
 	SetCommConfig( connection->handle, &cfg, cfgSize );
 
-	//TODO: check this
 	COMMTIMEOUTS timeout;
 	GetCommTimeouts( connection->handle, &timeout );
-	timeout.ReadIntervalTimeout = 500;
-	timeout.ReadTotalTimeoutMultiplier = 1;
+	timeout.ReadIntervalTimeout = 0;
+	timeout.ReadTotalTimeoutMultiplier = 0;
 	timeout.ReadTotalTimeoutConstant = 1000;
 	timeout.WriteTotalTimeoutConstant = 1000;
-	timeout.WriteTotalTimeoutMultiplier = 1;
+	timeout.WriteTotalTimeoutMultiplier = 0;
 	SetCommTimeouts( connection->handle, &timeout );
 
 	return connection;

@@ -29,7 +29,11 @@ int main( int argc, const char ** argv )
 	WCConnection_write( connection, &packet );
 	while( 1 )
 	{
-		WCConnection_read( connection, &packet );
+		if( WCConnection_read( connection, &packet ) <= 0)
+		{
+			fprintf( stderr, "Cannot read from connection\n" );
+			break;
+		}
 		switch( packet.header.type )
 		{
 			case WCPACKET_MESSAGE_TYPE:

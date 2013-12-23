@@ -1,6 +1,6 @@
 #
 #             LUFA Library
-#     Copyright (C) Dean Camera, 2012.
+#     Copyright (C) Dean Camera, 2013.
 #
 #  dean [at] fourwalledcubicle [dot] com
 #           www.lufa-lib.org
@@ -8,6 +8,8 @@
 # --------------------------------------
 #         LUFA Project Makefile.
 # --------------------------------------
+
+# Run "make help" for target help.
 
 MCU          = atmega32u4
 ARCH         = AVR8
