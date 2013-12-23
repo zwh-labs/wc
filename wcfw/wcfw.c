@@ -85,7 +85,7 @@ int main(void)
 	{
 		CDC_Task();
 		USB_USBTask();
-		_delay_ms(10);
+		_delay_ms(4);
 	}
 }
 
