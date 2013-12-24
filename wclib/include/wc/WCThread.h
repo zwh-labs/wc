@@ -8,7 +8,7 @@
 #include <stdbool.h>
 
 
-typedef struct WCThread WCThread;
+typedef struct _WCThread WCThread;
 
 
 WCThread * WCThread_start( WCConnection * connection );

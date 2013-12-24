@@ -1,3 +1,4 @@
+#include <wc/WCConfiguration_ArgumentParser.h>
 #include <wc/WCConfiguration.h>
 
 #include <string.h>

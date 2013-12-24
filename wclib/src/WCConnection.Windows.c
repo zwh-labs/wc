@@ -1,13 +1,15 @@
+#include <wc/WCConnection.h>
 #include <wc/WCPacket.h>
+
 #include <stdbool.h>
 #include <errno.h>
 #include <windows.h>
 
 
-typedef struct WCConnection
+struct _WCConnection
 {
 	HANDLE handle;
-} WCConnection;
+};
 
 
 WCConnection * WCConnection_open( const char * file )
@@ -60,6 +62,8 @@ WCConnection * WCConnection_open( const char * file )
 
 bool WCConnection_close( WCConnection * connection )
 {
+	if( !connection )
+		return false;
 	BOOL ret = CloseHandle( connection->handle );
 	free( connection );
 	return ret;

@@ -1,3 +1,5 @@
+#include <wc/WCConfiguration.h>
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -14,19 +16,20 @@
 #endif
 
 
-typedef struct WCConfigurationWheel
+typedef struct _WCConfigurationWheel WCConfigurationWheel;
+struct _WCConfigurationWheel
 {
 	unsigned int incrementsPerTurn;
 	double wheelDiameter;
-} WCConfigurationWheel;
+};
 
 
-typedef struct WCConfiguration
+struct _WCConfiguration
 {
 	char * devicePath;
 	unsigned int wheelCount;
 	WCConfigurationWheel * wheelConfigurations;
-} WCConfiguration;
+};
 
 
 const char * WCConfiguration_getDevicePath( const WCConfiguration * configuration )
@@ -81,11 +84,14 @@ bool WCConfiguration_setWheel( WCConfiguration * configuration, unsigned int whe
 }
 
 
-void WCConfiguration_delete( WCConfiguration * configuration )
+bool WCConfiguration_delete( WCConfiguration * configuration )
 {
+	if( !configuration )
+		return false;
 	free( configuration->devicePath );
 	free( configuration->wheelConfigurations );
 	free( configuration );
+	return true;
 }
 
 

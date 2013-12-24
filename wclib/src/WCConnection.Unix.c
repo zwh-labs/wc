@@ -1,4 +1,6 @@
+#include <wc/WCConnection.h>
 #include <wc/WCPacket.h>
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,12 +9,12 @@
 #include <termios.h>
 
 
-typedef struct WCConnection
+struct _WCConnection
 {
 	int fd;
 	struct termios initialTio;
 	struct termios tio;
-} WCConnection;
+};
 
 
 WCConnection * WCConnection_open( const char * file )
@@ -44,6 +46,8 @@ WCConnection * WCConnection_open( const char * file )
 
 bool WCConnection_close( WCConnection * connection )
 {
+	if( !connection )
+		return false;
 	tcsetattr( connection->fd, TCSANOW, &(connection->initialTio) );
 	int ret = close( connection->fd );
 	free( connection );

@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 
-typedef struct WCThread_Thread WCThread_Thread;
+typedef struct _WCThread_Thread WCThread_Thread;
 
 
 WCThread_Thread * WCThread_Thread_new( WCThread_ThreadMain threadMain, void * data );

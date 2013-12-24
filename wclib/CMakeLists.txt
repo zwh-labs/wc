@@ -4,8 +4,6 @@ project( wc )
 
 find_package( Threads )
 
-add_subdirectory( examples )
-
 set( wc_sources
 	src/WCPacket.c
 	src/WCConnection.c
@@ -38,3 +36,10 @@ set_target_properties( wc PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SO
 set_target_properties( wc PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
 set_target_properties( wc PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
 target_link_libraries( wc ${wc_libraries} )
+
+set( BUILD_EXAMPLES TRUE CACHE BOOL "Compile examples" )
+if( BUILD_EXAMPLES )
+	add_subdirectory( examples )
+else( BUILD_EXAMPLES )
+	message( STATUS "NOT building examples" )
+endif( BUILD_EXAMPLES )

@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 
-typedef struct WCConnection WCConnection;
+typedef struct _WCConnection WCConnection;
 
 
 WCConnection * WCConnection_open( const char * file );

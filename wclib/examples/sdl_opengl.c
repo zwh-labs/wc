@@ -150,8 +150,11 @@ void quit_sdl()
 void quit_wc()
 {
 	WCThread_stop( thread );
+	thread = NULL;
 	WCConnection_close( connection );
+	connection = NULL;
 	WCConfiguration_delete( configuration );
+	configuration = NULL;
 }
 
 

@@ -1,3 +1,4 @@
+#include "WCThread_Thread.h"
 #include "WCThread_ThreadMain.h"
 
 #include <windows.h>
@@ -6,13 +7,13 @@
 #include <stdlib.h>
 
 
-typedef struct WCThread_Thread
+struct _WCThread_Thread
 {
 	HANDLE winThread;
 	DWORD id;
 	WCThread_ThreadMain threadMain;
 	void * threadData;
-} WCThread_Thread;
+};
 
 
 static DWORD WINAPI starter( LPVOID threadData )

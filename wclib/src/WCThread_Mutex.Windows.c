@@ -1,12 +1,15 @@
+#include "WCThread_Mutex.h"
+
 #include <windows.h>
+
 #include <stdbool.h>
 #include <stdlib.h>
 
 
-typedef struct WCThread_Mutex
+struct _WCThread_Mutex
 {
 	HANDLE winMutex;
-} WCThread_Mutex;
+};
 
 
 WCThread_Mutex * WCThread_Mutex_new()
@@ -21,6 +24,7 @@ WCThread_Mutex * WCThread_Mutex_new()
 		free( mutex );
 		return NULL;
 	}
+
 	return mutex;
 }
 
@@ -39,6 +43,8 @@ bool WCThread_Mutex_unlock( WCThread_Mutex * mutex )
 
 bool WCThread_Mutex_delete( WCThread_Mutex * mutex )
 {
+	if( !mutex )
+		return false;
 	bool ret = CloseHandle( &(mutex->winMutex) );
 	free( mutex );
 	return ret;

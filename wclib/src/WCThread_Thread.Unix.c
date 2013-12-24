@@ -1,17 +1,19 @@
+#include "WCThread_Thread.h"
 #include "WCThread_ThreadMain.h"
 
 #include <pthread.h>
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 
-typedef struct WCThread_Thread
+struct _WCThread_Thread
 {
 	pthread_t pthreadThread;
 	WCThread_ThreadMain threadMain;
 	void * threadData;
-} WCThread_Thread;
+};
 
 
 static void * starter( void * threadData )

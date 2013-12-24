@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 
-typedef struct WCThread_Mutex WCThread_Mutex;
+typedef struct _WCThread_Mutex WCThread_Mutex;
 
 
 WCThread_Mutex * WCThread_Mutex_new();

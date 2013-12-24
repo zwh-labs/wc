@@ -1,3 +1,5 @@
+#include <wc/WCThread.h>
+
 #include "WCThread_Thread.h"
 #include "WCThread_Mutex.h"
 
@@ -11,7 +13,7 @@
 #include <stdlib.h>
 
 
-typedef struct WCThread
+struct _WCThread
 {
 	WCThread_Thread * thread;
 
@@ -24,7 +26,7 @@ typedef struct WCThread
 	WCThread_Mutex * wheelsMutex;
 	unsigned int numWheels;
 	WCWheelMovement * wheelMovements;
-} WCThread;
+};
 
 
 static void handleWheel( WCThread * thread, WCPacket_Wheel * pw )
@@ -135,6 +137,9 @@ WCThread * WCThread_start( WCConnection * connection )
 
 bool WCThread_stop( WCThread * thread )
 {
+	if( !thread )
+		return false;
+
 	WCThread_Mutex_lock( thread->shutdownMutex );
 		thread->shutdown = true;
 	WCThread_Mutex_unlock( thread->shutdownMutex );
