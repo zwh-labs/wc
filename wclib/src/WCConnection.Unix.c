@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
@@ -62,6 +63,8 @@ static ssize_t readBytes( int fd, void * buffer, size_t length )
 	while( bytesRead < length )
 	{
 		ssize_t ret = read( fd, ((char*)buffer) + bytesRead, length - bytesRead );
+		if( ret < 0 && errno == EINTR )
+			continue;
 		if( ret <= 0 )
 			return ret;
 		bytesRead += ret;

@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 
-#define DEFAULT_WHEELINCREMENTSPERTURN (1024)
+#define DEFAULT_WHEELINCREMENTSPERTURN (4096)
 #define DEFAULT_WHEELDIAMETER           (1.0)
 
 #ifdef _WIN32
