@@ -20,7 +20,6 @@ typedef struct _WCConfigurationWheel WCConfigurationWheel;
 struct _WCConfigurationWheel
 {
 	unsigned int incrementsPerTurn;
-	double wheelDiameter;
 };
 
 
@@ -52,14 +51,6 @@ unsigned int WCConfiguration_getWheelIncrementsPerTurn( const WCConfiguration * 
 }
 
 
-double WCConfiguration_getWheelDiameter( const WCConfiguration * configuration, unsigned int wheelIndex )
-{
-	if( wheelIndex >= configuration->wheelCount )
-		return DEFAULT_WHEELDIAMETER;
-	return configuration->wheelConfigurations[wheelIndex].wheelDiameter;
-}
-
-
 void WCConfiguration_setDevicePath( WCConfiguration * configuration, const char * devicePath )
 {
 	free( configuration->devicePath );
@@ -68,7 +59,7 @@ void WCConfiguration_setDevicePath( WCConfiguration * configuration, const char 
 }
 
 
-bool WCConfiguration_setWheel( WCConfiguration * configuration, unsigned int wheelIndex, unsigned int incrementsPerTurn, double wheelDiameter )
+bool WCConfiguration_setWheelIncrementsPerTurn( WCConfiguration * configuration, unsigned int wheelIndex, unsigned int incrementsPerTurn )
 {
 	if( wheelIndex >= configuration->wheelCount )
 	{
@@ -79,7 +70,6 @@ bool WCConfiguration_setWheel( WCConfiguration * configuration, unsigned int whe
 	}
 	configuration->wheelCount = wheelIndex + 1;
 	configuration->wheelConfigurations[wheelIndex].incrementsPerTurn = incrementsPerTurn;
-	configuration->wheelConfigurations[wheelIndex].wheelDiameter = wheelDiameter;
 	return true;
 }
 
@@ -115,6 +105,6 @@ int WCConfiguration_fprint( FILE * stream, const WCConfiguration * configuration
 	if( configuration->wheelCount )
 		cnt += fprintf( stream, "\tWheels:\n" );
 	for( unsigned int i=0; i<configuration->wheelCount; i++ )
-		cnt += fprintf( stream, "\t\t%u - %u incrementsPerTurn - %lf diameter\n", i, configuration->wheelConfigurations[i].incrementsPerTurn, configuration->wheelConfigurations[i].wheelDiameter );
+		cnt += fprintf( stream, "\t\t%u - %u incrementsPerTurn\n", i, configuration->wheelConfigurations[i].incrementsPerTurn );
 	return cnt;
 }

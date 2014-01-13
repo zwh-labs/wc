@@ -30,7 +30,6 @@ WCConfiguration * WCConfiguration_newFromArguments( int argc, const char ** argv
 
 				unsigned int index;
 				unsigned int incrementsPerTurn;
-				double diameter;
 				char * token;
 				token = strtok( tmp, ":" );
 				if( token )
@@ -42,12 +41,7 @@ WCConfiguration * WCConfiguration_newFromArguments( int argc, const char ** argv
 				{
 					sscanf( token, "%u", &incrementsPerTurn );
 				}
-				token = strtok( NULL, ":" );
-				if( token )
-				{
-					sscanf( token, "%lf", &diameter );
-				}
-				WCConfiguration_setWheel( configuration, index, incrementsPerTurn, diameter );
+				WCConfiguration_setWheelIncrementsPerTurn( configuration, index, incrementsPerTurn );
 
 				free( tmp );
 			}

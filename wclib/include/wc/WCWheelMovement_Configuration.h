@@ -7,7 +7,6 @@
 
 
 double WCWheelMovement_getIncrementsAsTurns( const WCWheelMovement * wm, const WCConfiguration * c );
-double WCWheelMovement_getIncrementsAsDistance( const WCWheelMovement * wm, const WCConfiguration * c );
 
 
 #endif
