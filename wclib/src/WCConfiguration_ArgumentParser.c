@@ -41,7 +41,7 @@ WCConfiguration * WCConfiguration_newFromArguments( int argc, const char ** argv
 				{
 					sscanf( token, "%u", &incrementsPerTurn );
 				}
-				WCConfiguration_setWheelIncrementsPerTurn( configuration, index, incrementsPerTurn );
+				WCConfiguration_setWheel( configuration, index, incrementsPerTurn );
 
 				free( tmp );
 			}

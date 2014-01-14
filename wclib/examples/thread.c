@@ -43,7 +43,7 @@ int main( int argc, const char ** argv )
 	while( cnt < 10 )
 	{
 		sleep( 1 );
-		for( int i = 0; i<WCThread_getWheelCount( thread ); i++ )
+		for( unsigned int i = 0; i<WCThread_getWheelCount( thread ); i++ )
 		{
 			WCWheelMovement wm = WCThread_retrieveWheelMovement( thread, i );
 			printf( "Wheel:\tchannel=%d\terror=%d\tvalue=%d\n", i, WCWheelMovement_getError( &wm ), WCWheelMovement_getIncrements( &wm ) );

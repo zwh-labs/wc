@@ -173,9 +173,9 @@ WCWheelMovement WCThread_retrieveWheelMovement( WCThread * thread, unsigned int 
 }
 
 
-int WCThread_getWheelCount( WCThread * thread )
+unsigned int WCThread_getWheelCount( WCThread * thread )
 {
-	int wheelCount = 0;
+	unsigned int wheelCount = 0;
 	WCThread_Mutex_lock( thread->wheelsMutex );
 		wheelCount = thread->numWheels;
 	WCThread_Mutex_unlock( thread->wheelsMutex );

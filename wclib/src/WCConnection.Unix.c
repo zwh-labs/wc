@@ -36,8 +36,8 @@ WCConnection * WCConnection_open( const char * file )
 	connection->tio.c_iflag = IGNPAR;
 	connection->tio.c_oflag = 0;
 	connection->tio.c_lflag = 0;
-	connection->tio.c_cc[VTIME] = 0;
-	connection->tio.c_cc[VMIN] = 1;
+	connection->tio.c_cc[VTIME] = 10;
+	connection->tio.c_cc[VMIN] = 0;
 	tcflush( connection->fd, TCIFLUSH );
 	tcsetattr( connection->fd, TCSANOW, &connection->tio );
 

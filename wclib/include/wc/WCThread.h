@@ -15,7 +15,7 @@ WCThread * WCThread_start( WCConnection * connection );
 bool WCThread_stop( WCThread * thread );
 
 WCWheelMovement WCThread_retrieveWheelMovement( WCThread * thread, unsigned int index );
-int WCThread_getWheelCount( WCThread * thread );
+unsigned int WCThread_getWheelCount( WCThread * thread );
 
 
 #endif

@@ -59,7 +59,7 @@ void WCConfiguration_setDevicePath( WCConfiguration * configuration, const char 
 }
 
 
-bool WCConfiguration_setWheelIncrementsPerTurn( WCConfiguration * configuration, unsigned int wheelIndex, unsigned int incrementsPerTurn )
+bool WCConfiguration_setWheel( WCConfiguration * configuration, unsigned int wheelIndex, unsigned int incrementsPerTurn )
 {
 	if( wheelIndex >= configuration->wheelCount )
 	{
@@ -107,4 +107,10 @@ int WCConfiguration_fprint( FILE * stream, const WCConfiguration * configuration
 	for( unsigned int i=0; i<configuration->wheelCount; i++ )
 		cnt += fprintf( stream, "\t\t%u - %u incrementsPerTurn\n", i, configuration->wheelConfigurations[i].incrementsPerTurn );
 	return cnt;
+}
+
+
+int WCConfiguration_print( const WCConfiguration * configuration )
+{
+	return WCConfiguration_fprint( stdout, configuration );
 }
