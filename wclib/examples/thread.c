@@ -1,8 +1,10 @@
-#include <wc/WCConfiguration.h>
-#include <wc/WCConfiguration_ArgumentParser.h>
-#include <wc/WCConnection.h>
-#include <wc/WCThread.h>
-#include <wc/WCWheelMovement.h>
+#include <wc/Configuration.h>
+#include <wc/Configuration_stdio.h>
+#include <wc/Configuration_ArgumentParser.h>
+#include <wc/Connection.h>
+#include <wc/Connection_Configuration.h>
+#include <wc/Thread.h>
+#include <wc/WheelMovement.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -20,20 +22,20 @@ void sleep( int sec )
 int main( int argc, const char ** argv )
 {
 	fprintf( stderr, "Reading configuration ... " ); fflush( stderr );
-	WCConfiguration * configuration = WCConfiguration_newFromArguments( argc, argv );
+	wcConfiguration * configuration = wcConfiguration_newFromArguments( argc, argv );
 	if( !configuration )
 		goto configuration_failed;
 	fprintf( stderr, "done\n" );
-	WCConfiguration_fprint( stderr, configuration );
+	wcConfiguration_fprint( stderr, configuration );
 
 	fprintf( stderr, "Opening connection ... " ); fflush( stderr );
-	WCConnection * connection = WCConnection_open( WCConfiguration_getDevicePath( configuration ) );
+	wcConnection * connection = wcConnection_openFromConfiguration( configuration );
 	if( !connection )
 		goto connection_failed;
 	fprintf( stderr, "done\n" );
 
 	fprintf( stderr, "Starting thread on connection ... " ); fflush( stderr );
-	WCThread * thread = WCThread_start( connection );
+	wcThread * thread = wcThread_start( connection );
 	if( !thread )
 		goto thread_failed;
 	fprintf( stderr, "done\n" );
@@ -43,31 +45,31 @@ int main( int argc, const char ** argv )
 	while( cnt < 10 )
 	{
 		sleep( 1 );
-		for( unsigned int i = 0; i<WCThread_getWheelCount( thread ); i++ )
+		for( unsigned int i = 0; i<wcThread_getWheelCount( thread ); i++ )
 		{
-			WCWheelMovement wm = WCThread_retrieveWheelMovement( thread, i );
-			printf( "Wheel:\tchannel=%d\terror=%d\tvalue=%d\n", i, WCWheelMovement_getError( &wm ), WCWheelMovement_getIncrements( &wm ) );
+			wcWheelMovement wm = wcThread_retrieveWheelMovement( thread, i );
+			printf( "Wheel:\tchannel=%d\terror=%d\tvalue=%d\n", i, wcWheelMovement_getError( &wm ), wcWheelMovement_getIncrements( &wm ) );
 		}
 		cnt++;
 	}
 
 	fprintf( stderr, "Stopping thread ... " ); fflush( stderr );
-	if( !WCThread_stop( thread ) )
+	if( !wcThread_stop( thread ) )
 		goto thread_failed;
 	fprintf( stderr, "done\n" );
 
 	fprintf( stderr, "Closing connection ... " ); fflush( stderr );
-	if( !WCConnection_close( connection ) )
+	if( !wcConnection_close( connection ) )
 		goto connection_failed;
 	fprintf( stderr, "done\n" );
 
-	WCConfiguration_delete( configuration );
+	wcConfiguration_delete( configuration );
 	return 0;
 
 thread_failed:
-	WCConnection_close( connection );
+	wcConnection_close( connection );
 connection_failed:
-	WCConfiguration_delete( configuration );
+	wcConfiguration_delete( configuration );
 configuration_failed:
 	fprintf( stderr, "failed\n" );
 	return 1;

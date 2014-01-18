@@ -1,30 +1,30 @@
 using System;
-using System.Threading;
+using WC;
 
 
 public class ThreadCS
 {
 	static public void Main()
 	{
-		WCConfiguration configuration = new WCConfiguration();
+		Configuration configuration = new Configuration();
 //		configuration.setDevicePath("COM3");
-		configuration.setDevicePath("/dev/pts/4");
+		configuration.devicePath = "/dev/pts/4";
 		configuration.setWheel( 0, 4096 );
 		configuration.setWheel( 1, 4096 );
-		configuration.print();
+		Console.WriteLine( configuration );
 
-		WCConnection connection = new WCConnection( configuration.getDevicePath() );
-		WCThread thread = new WCThread( connection );
+		Connection connection = new Connection( configuration );
+		Thread thread = new Thread( connection );
 
 		Console.WriteLine("Running for 10 seconds");
 		int cnt = 0;
 		while( cnt < 10 )
 		{
-			Thread.Sleep( 1000 );
-			for( uint i = 0; i < thread.getWheelCount(); i++ )
+			System.Threading.Thread.Sleep( 1000 );
+			for( uint i = 0; i < thread.wheelCount; i++ )
 			{
-				WCWheelMovement wm = thread.retrieveWheelMovement( i );
-				Console.WriteLine("Wheel:\tchannel=" + i + "\terror=" + wm.error + "\tvalue=" + wm.increments + "\tturn=" + wm.getIncrementsAsTurns( configuration ) );
+				WheelMovement wm = thread.retrieveWheelMovement( i );
+				Console.WriteLine("Wheel:\tchannel=" + i + "\terror=" + wm.error + "\tvalue=" + wm.increments + "\tturn=" + wm.getTurns( configuration ) );
 			}
 			cnt++;
 		}

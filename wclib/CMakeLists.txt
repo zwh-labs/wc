@@ -5,14 +5,16 @@ project( wc )
 find_package( Threads )
 
 set( wc_sources
-	src/WCPacket.c
-	src/WCConnection.c
-	src/WCThread.c
-	src/WCThread_Mutex.c
-	src/WCThread_Thread.c
-	src/WCConfiguration.c
-	src/WCConfiguration_ArgumentParser.c
-	src/WCWheelMovement_Configuration.c
+	src/Packet.c
+	src/Connection.c
+	src/Connection_Configuration.c
+	src/Thread.c
+	src/Thread_Mutex.c
+	src/Thread_Thread.c
+	src/Configuration.c
+	src/Configuration_stdio.c
+	src/Configuration_ArgumentParser.c
+	src/WheelMovement_Configuration.c
 )
 
 set( wc_include_dirs

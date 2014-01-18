@@ -7,8 +7,8 @@
 #include "IncRotDec.h"
 #include "USBDescriptors.h"
 
-#include <wc/WCPacket.h>
-#include <wc/WCError.h>
+#include <wc/Packet.h>
+#include <wc/Error.h>
 
 #include <LUFA/Drivers/Board/LEDs.h>
 #include <LUFA/Drivers/USB/USB.h>
@@ -24,7 +24,7 @@
 
 static IncRotDec incRotDecA;
 static IncRotDec incRotDecB;
-static WCPacket_Message message;
+static wcPacket_Message message;
 
 
 ISR( TIMER1_COMPA_vect )
@@ -90,12 +90,12 @@ int main(void)
 }
 
 
-void interpretPacket( const WCPacket * packet )
+void interpretPacket( const wcPacket * packet )
 {
 	switch( packet->header.type )
 	{
-		case WCPACKET_REQUESTINFO_TYPE:
-			WCPacket_Message_create( &message, "#WCFW created on "__DATE__" "__TIME__ );
+		case WC_PACKET_REQUESTINFO_TYPE:
+			wcPacket_Message_create( &message, "#WCFW created on "__DATE__" "__TIME__ );
 			break;
 	}
 }
@@ -114,22 +114,22 @@ void CDC_Task(void)
 	// write message if available
 	if( message.header.length )
 	{
-		Endpoint_Write_Stream_LE( &message, WCPacket_size((const WCPacket*)&message), NULL );
+		Endpoint_Write_Stream_LE( &message, wcPacket_size((const wcPacket*)&message), NULL );
 		message.header.length = 0; // empty message, so we won't send the same message again
 	}
 
 	// write wheel counters
 	int16_t value = 0;
 	uint8_t error;
-	WCPacket_Wheel wheel;
+	wcPacket_Wheel wheel;
 	// channel 0
 	error = IncRotDec_retrieve( &incRotDecA, &value );
-	WCPacket_Wheel_create( &wheel, 0, error?WCERROR_WHEELSIGNAL:WCERROR_NOERROR, value );
-	Endpoint_Write_Stream_LE( &wheel, WCPacket_size((const WCPacket*)&wheel), NULL );
+	wcPacket_Wheel_create( &wheel, 0, error?WC_ERROR_WHEELSIGNAL:WC_ERROR_NOERROR, value );
+	Endpoint_Write_Stream_LE( &wheel, wcPacket_size((const wcPacket*)&wheel), NULL );
 	// channel 1
 	error = IncRotDec_retrieve( &incRotDecB, &value );
-	WCPacket_Wheel_create( &wheel, 1, error?WCERROR_WHEELSIGNAL:WCERROR_NOERROR, value );
-	Endpoint_Write_Stream_LE( &wheel, WCPacket_size((const WCPacket*)&wheel), NULL );
+	wcPacket_Wheel_create( &wheel, 1, error?WC_ERROR_WHEELSIGNAL:WC_ERROR_NOERROR, value );
+	Endpoint_Write_Stream_LE( &wheel, wcPacket_size((const wcPacket*)&wheel), NULL );
 
 	// clear
 	bool isFull = (Endpoint_BytesInEndpoint() == CDC_TXRX_EPSIZE);
@@ -146,11 +146,11 @@ void CDC_Task(void)
 	if( Endpoint_IsOUTReceived() )
 	{
 		uint8_t ret;
-		WCPacket packet;
-		ret = Endpoint_Read_Stream_LE( &(packet.header), sizeof(WCPacket_Header), NULL );
+		wcPacket packet;
+		ret = Endpoint_Read_Stream_LE( &(packet.header), sizeof(wcPacket_Header), NULL );
 		if( ret == ENDPOINT_RWSTREAM_NoError )
 		{
-			if( WCPacket_size( &packet ) > WCPACKET_MAXSIZE )
+			if( wcPacket_size( &packet ) > WC_PACKET_MAXSIZE )
 			{
 				Endpoint_Discard_Stream( packet.header.length, NULL );
 			}

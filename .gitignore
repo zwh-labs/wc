@@ -9,6 +9,7 @@
 *.sym
 *.cmake
 *.dll
+*.exe
 *.a
 *.kdev4
 CMakeCache.txt
@@ -18,3 +19,4 @@ wclib/bin/
 wclib/lib/
 wclib/examples/Makefile
 build/
+build.*/

@@ -1,9 +1,11 @@
-#include <wc/WCConfiguration.h>
-#include <wc/WCConfiguration_ArgumentParser.h>
-#include <wc/WCConnection.h>
-#include <wc/WCThread.h>
-#include <wc/WCWheelMovement.h>
-#include <wc/WCWheelMovement_Configuration.h>
+#include <wc/Configuration.h>
+#include <wc/Configuration_stdio.h>
+#include <wc/Configuration_ArgumentParser.h>
+#include <wc/Connection.h>
+#include <wc/Connection_Configuration.h>
+#include <wc/Thread.h>
+#include <wc/WheelMovement.h>
+#include <wc/WheelMovement_Configuration.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
@@ -17,9 +19,9 @@
 SDL_Window * window = NULL;
 SDL_GLContext glContext = 0;
 
-WCConfiguration * configuration = NULL;
-WCConnection * connection = NULL;
-WCThread * thread = NULL;
+wcConfiguration * configuration = NULL;
+wcConnection * connection = NULL;
+wcThread * thread = NULL;
 
 
 bool init_sdl()
@@ -65,22 +67,22 @@ bool init_sdl()
 
 bool init_wc( int argc, const char ** argv )
 {
-	configuration = WCConfiguration_newFromArguments( argc, argv );
+	configuration = wcConfiguration_newFromArguments( argc, argv );
 	if( !configuration )
 	{
 		fprintf( stderr, "Failed to read configuration\n" );
 		return false;
 	}
-	WCConfiguration_fprint( stderr, configuration );
+	wcConfiguration_fprint( stderr, configuration );
 
-	connection = WCConnection_open( WCConfiguration_getDevicePath( configuration ) );
+	connection = wcConnection_openFromConfiguration( configuration );
 	if( !connection )
 	{
 		fprintf( stderr, "Failed to open connection\n" );
 		return false;
 	}
 
-	thread = WCThread_start( connection );
+	thread = wcThread_start( connection );
 	if( !thread )
 	{
 		fprintf( stderr, "Failed to start thread\n" );
@@ -106,13 +108,13 @@ void update()
 {
 	glClear( GL_COLOR_BUFFER_BIT );
 
-	WCWheelMovement wmA = WCThread_retrieveWheelMovement( thread, 0 );
-	WCWheelMovement wmB = WCThread_retrieveWheelMovement( thread, 1 );
+	wcWheelMovement wmA = wcThread_retrieveWheelMovement( thread, 0 );
+	wcWheelMovement wmB = wcThread_retrieveWheelMovement( thread, 1 );
 
 	static float rotA = 0;
 	static float rotB = 0;
-	rotA += WCWheelMovement_getIncrementsAsTurns( &wmA, configuration ) * 360.0f;
-	rotB += WCWheelMovement_getIncrementsAsTurns( &wmB, configuration ) * 360.0f;
+	rotA += wcWheelMovement_getTurns( &wmA, configuration ) * 360.0f;
+	rotB += wcWheelMovement_getTurns( &wmB, configuration ) * 360.0f;
 
 	glPushMatrix();
 		glColor3f(1,0,0);
@@ -149,11 +151,11 @@ void quit_sdl()
 
 void quit_wc()
 {
-	WCThread_stop( thread );
+	wcThread_stop( thread );
 	thread = NULL;
-	WCConnection_close( connection );
+	wcConnection_close( connection );
 	connection = NULL;
-	WCConfiguration_delete( configuration );
+	wcConfiguration_delete( configuration );
 	configuration = NULL;
 }
 
