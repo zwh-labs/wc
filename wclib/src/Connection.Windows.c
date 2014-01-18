@@ -62,9 +62,10 @@ wcConnection * wcConnection_open( const char * file )
 
 bool wcConnection_close( wcConnection * connection )
 {
+	BOOL ret;
 	if( !connection )
 		return false;
-	BOOL ret = CloseHandle( connection->handle );
+	ret = CloseHandle( connection->handle );
 	free( connection );
 	return ret;
 }

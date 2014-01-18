@@ -4,11 +4,6 @@
 #include <wc/Configuration.h>
 #include <wc/Configuration_ArgumentParser.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdint.h>
-#include <fcntl.h>
 
 
 int main( int argc, const char ** argv )

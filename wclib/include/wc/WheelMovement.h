@@ -13,6 +13,11 @@ typedef struct
 } wcWheelMovement;
 
 
+#ifdef _MSC_VER
+	#define inline __forceinline
+#endif
+
+
 static inline unsigned int wcWheelMovement_getIndex( const wcWheelMovement * wm )
 	{ return wm->index; }
 

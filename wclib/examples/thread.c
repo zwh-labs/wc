@@ -7,15 +7,16 @@
 #include <wc/WheelMovement.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 
 #ifdef _WIN32
-#include <windows.h>
-void sleep( int sec )
-{
-	Sleep( sec * 1000 );
-}
+	#include <windows.h>
+	void sleep( int sec )
+	{
+		Sleep( sec * 1000 );
+	}
+#else
+	#include <unistd.h>
 #endif
 
 
