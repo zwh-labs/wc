@@ -2,11 +2,12 @@
 #define _WC_WHEELMOVEMENT_CONFIGURATION_H_
 
 
+#include "wc_export.h"
 #include <wc/WheelMovement.h>
 #include <wc/Configuration.h>
 
 
-double wcWheelMovement_getTurns( const wcWheelMovement * wm, const wcConfiguration * c );
+WC_EXPORT double wcWheelMovement_getTurns( const wcWheelMovement * wm, const wcConfiguration * c );
 
 
 #endif

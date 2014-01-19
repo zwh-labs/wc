@@ -2,6 +2,7 @@
 #define _WC_WHEELMOVEMENT_PACKET_H_
 
 
+#include "wc_export.h"
 #include <wc/WheelMovement.h>
 #include <wc/Packet.h>
 

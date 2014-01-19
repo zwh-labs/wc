@@ -13,7 +13,7 @@ typedef struct
 } wcWheelMovement;
 
 
-#ifdef _MSC_VER
+#ifdef _MSC_VER // C99 anyone?
 	#define inline __forceinline
 #endif
 

@@ -1,4 +1,4 @@
-#include <wc/WheelMovement.h>
+#include <wc/WheelMovement_Configuration.h>
 #include <wc/Configuration.h>
 
 

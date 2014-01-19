@@ -2,6 +2,7 @@
 #define _WC_PACKET_H_
 
 
+#include "wc_export.h"
 #include <stdint.h>
 
 
@@ -59,11 +60,11 @@ typedef struct
 #pragma pack(pop)
 
 
-uint16_t wcPacket_size( const wcPacket * packet );
+WC_EXPORT uint16_t wcPacket_size( const wcPacket * packet );
 
-void wcPacket_Message_create( wcPacket_Message * message, const char * string );
-void wcPacket_Wheel_create( wcPacket_Wheel * wheel, uint8_t channel, uint8_t error, int16_t value );
-void wcPacket_RequestInfo_create( wcPacket_RequestInfo * requestInfo );
+WC_EXPORT void wcPacket_Message_create( wcPacket_Message * message, const char * string );
+WC_EXPORT void wcPacket_Wheel_create( wcPacket_Wheel * wheel, uint8_t channel, uint8_t error, int16_t value );
+WC_EXPORT void wcPacket_RequestInfo_create( wcPacket_RequestInfo * requestInfo );
 
 
 #endif
