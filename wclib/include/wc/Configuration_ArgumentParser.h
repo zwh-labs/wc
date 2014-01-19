@@ -6,7 +6,15 @@
 #include <wc/Configuration.h>
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 WC_EXPORT wcConfiguration * wcConfiguration_newFromArguments( int argc, const char ** argv );
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

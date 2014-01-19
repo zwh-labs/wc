@@ -9,6 +9,10 @@
 typedef struct _wcConfiguration wcConfiguration;
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 WC_EXPORT const char * wcConfiguration_getDevicePath( const wcConfiguration * configuration );
 WC_EXPORT unsigned int wcConfiguration_getWheelCount( const wcConfiguration * configuration );
 WC_EXPORT unsigned int wcConfiguration_getWheelIncrementsPerTurn( const wcConfiguration * configuration, unsigned int wheelIndex );
@@ -18,6 +22,10 @@ WC_EXPORT bool wcConfiguration_setWheel( wcConfiguration * configuration, unsign
 
 WC_EXPORT bool wcConfiguration_delete( wcConfiguration * configuration );
 WC_EXPORT wcConfiguration * wcConfiguration_new();
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

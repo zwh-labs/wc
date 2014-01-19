@@ -7,7 +7,15 @@
 #include <wc/Configuration.h>
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 WC_EXPORT double wcWheelMovement_getTurns( const wcWheelMovement * wm, const wcConfiguration * c );
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif
