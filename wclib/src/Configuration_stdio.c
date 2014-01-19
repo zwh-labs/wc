@@ -66,7 +66,7 @@ int wcConfiguration_fprint( FILE * stream, const wcConfiguration * configuration
 	if( size < 0 )
 		return -1;
 	size += 1;	// + 1 for terminating '\0'
-	char * buf = malloc( size );
+	char * buf = (char*) malloc( size );
 	if( !buf )
 		return -1;
 	wcConfiguration_snprint( buf, size, configuration );
