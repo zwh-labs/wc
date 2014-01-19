@@ -51,7 +51,7 @@ wcThread_Thread * wcThread_Thread_new( wcThread_ThreadMain threadMain, void * da
 
 bool wcThread_Thread_join( wcThread_Thread * thread )
 {
-	return WaitForSingleObject( thread->winThread, INFINITE );
+	return WaitForSingleObject( thread->winThread, INFINITE ) == WAIT_OBJECT_0;
 }
 
 
