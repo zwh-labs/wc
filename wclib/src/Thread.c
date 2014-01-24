@@ -34,7 +34,7 @@ static void handleWheel( wcThread * thread, wcPacket_Wheel * pw )
 	wcThread_Mutex_lock( thread->wheelsMutex );
 		if( thread->numWheels <= pw->channel )
 		{
-			fprintf( stderr, "Increasing number of tracked wheels from %d to %d\n", thread->numWheels, pw->channel + 1 );
+//			fprintf( stderr, "Increasing number of tracked wheels from %d to %d\n", thread->numWheels, pw->channel + 1 );
 			thread->wheelMovements = (wcWheelMovement*) realloc( thread->wheelMovements, sizeof(wcWheelMovement) * (pw->channel + 1) );
 			wcWheelMovement_createFromPacket( &(thread->wheelMovements[thread->numWheels]), pw );
 			thread->numWheels = pw->channel + 1;

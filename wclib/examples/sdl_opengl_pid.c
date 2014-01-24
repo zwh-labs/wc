@@ -6,6 +6,7 @@
 #include <wc/Thread.h>
 #include <wc/WheelMovement.h>
 #include <wc/WheelMovement_Configuration.h>
+#include <wc/WheelPIDController.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
@@ -16,12 +17,20 @@
 #include <stdbool.h>
 
 
+#define WHEELNUM 2
+
+
 static SDL_Window * window = NULL;
 static SDL_GLContext glContext = 0;
 
 static wcConfiguration * configuration = NULL;
 static wcConnection * connection = NULL;
 static wcThread * thread = NULL;
+
+static wcWheelPIDController * wheelControllers[WHEELNUM] = { 0 };
+static int targetWheelAngleIncrements[WHEELNUM] = { 0 };
+static double wheelRotations[WHEELNUM] = { 0.0f };
+static double wheelVelocities[WHEELNUM] = { 0.0f };
 
 
 bool init_sdl()
@@ -35,7 +44,7 @@ bool init_sdl()
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
 
-	window = SDL_CreateWindow( "WheelChar SDL2/OpenGL Example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE );
+	window = SDL_CreateWindow( "WheelChar SDL2/OpenGL Example PID Control", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE );
 	if( !window )
 	{
 		fprintf( stderr, "Failed to create Window: %s\n", SDL_GetError() );
@@ -88,6 +97,17 @@ bool init_wc( int argc, const char ** argv )
 		fprintf( stderr, "Failed to start thread\n" );
 		return false;
 	}
+
+	for( int i=0; i<WHEELNUM; i++ )
+	{
+		wheelControllers[i] = wcWheelPIDController_new( configuration, i );
+		if( !wheelControllers[i] )
+		{
+			fprintf( stderr, "Failed to instantiate PID controller\n" );
+			return false;
+		}
+	}
+
 	return true;
 }
 
@@ -104,38 +124,48 @@ bool init( int argc, const char ** argv )
 }
 
 
+static inline double fraction( double d )
+{
+	return d - floor(d);
+}
+
+
 void update()
 {
+	static unsigned int lastTime = 0;
+	static unsigned int currentTime = 0;
+
+	currentTime = SDL_GetTicks();
+	double delta = (double)(currentTime - lastTime) / 1000.0;
+	lastTime = currentTime;
+
 	glClear( GL_COLOR_BUFFER_BIT );
 
-	wcWheelMovement wmA = wcThread_retrieveWheelMovement( thread, 0 );
-	wcWheelMovement wmB = wcThread_retrieveWheelMovement( thread, 1 );
+	for( int i=0; i<WHEELNUM; i++ )
+	{
+		int incrementsPerTurn = wcConfiguration_getWheelIncrementsPerTurn( configuration, i );
 
-	static float rotA = 0;
-	static float rotB = 0;
-	rotA += wcWheelMovement_getTurns( &wmA, configuration ) * 360.0f;
-	rotB += wcWheelMovement_getTurns( &wmB, configuration ) * 360.0f;
+		wcWheelMovement wm = wcThread_retrieveWheelMovement( thread, i );
+		targetWheelAngleIncrements[i] += wcWheelMovement_getIncrements( &wm );
+		targetWheelAngleIncrements[i] %= incrementsPerTurn;
 
-	glPushMatrix();
-		glColor3f(1,0,0);
-		glRotatef( rotB, 0,0,1 );
-		glBegin( GL_QUADS );
-			glVertex2f( -0.5f, -0.5f );
-			glVertex2f( 0.5f, -0.5f );
-			glVertex2f( 0.5f, 0.5f );
-			glVertex2f( -0.5f, 0.5f );
-		glEnd();
-	glPopMatrix();
-	glPushMatrix();
-		glColor3f(0,1,0);
-		glRotatef( rotA, 0,0,1 );
-		glBegin( GL_QUADS );
-			glVertex2f( -0.5f, -0.5f );
-			glVertex2f( 0.5f, -0.5f );
-			glVertex2f( 0.5f, 0.5f );
-			glVertex2f( -0.5f, 0.5f );
-		glEnd();
-	glPopMatrix();
+		int actualAngleIncrements = wheelRotations[i] * (double)incrementsPerTurn;
+		double controlValue = wcWheelPIDController_update( wheelControllers[i], targetWheelAngleIncrements[i], actualAngleIncrements, delta );
+		wheelVelocities[i] += controlValue;
+		wheelRotations[i] += wheelVelocities[i];
+		wheelRotations[i] = fraction(wheelRotations[i]);
+		glPushMatrix();
+			unsigned char color = i+1;
+			glColor3f( color&1, color&2, color&4 );
+			glRotatef( wheelRotations[i] * 360.0f, 0,0,1 );
+			glBegin( GL_QUADS );
+				glVertex2f( -0.5f, -0.5f );
+				glVertex2f( 0.5f, -0.5f );
+				glVertex2f( 0.5f, 0.5f );
+				glVertex2f( -0.5f, 0.5f );
+			glEnd();
+		glPopMatrix();
+	}
 }
 
 
@@ -157,6 +187,8 @@ void quit_wc()
 	connection = NULL;
 	wcConfiguration_delete( configuration );
 	configuration = NULL;
+	for( int i=0; i<WHEELNUM; i++ )
+		wcWheelPIDController_delete( wheelControllers[i] );
 }
 
 

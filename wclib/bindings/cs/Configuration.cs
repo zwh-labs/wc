@@ -27,7 +27,7 @@ public class Configuration
 	public string devicePath
 	{
 		get { return Marshal.PtrToStringAnsi( wcConfiguration_getDevicePath( handle ) ); }
-		set { wcConfiguration_setDevicePath( handle, Marshal.StringToHGlobalAnsi( devicePath ) ); }
+		set { wcConfiguration_setDevicePath( handle, Marshal.StringToHGlobalAnsi( value ) ); }
 	}
 	public uint wheelCount
 	{

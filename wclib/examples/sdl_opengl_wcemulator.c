@@ -1,9 +1,19 @@
+/* This example emulates wheels and sends the packets to a serial console.
+ * Example usage:
+ * - Create a pair of pseudo terminals using
+ *     # socat -d -d pty,raw,echo=0 pty,raw,echo=0
+ *   this will create a for example /dev/pts/4 and /dev/pts/5
+ * - Run the emulator on one of the pseudo terminals
+ *     # ./wcExampleSDL2OpenGLWCEmulator --devicePath /dev/pts/5
+ * - Now connect another example to the other side
+ *     # ./wcExampleSDL2OpenGLPID --devicePath /dev/pts/4
+ */
+
 #include <wc/Configuration.h>
 #include <wc/Configuration_stdio.h>
 #include <wc/Configuration_ArgumentParser.h>
 #include <wc/Connection.h>
 #include <wc/Connection_Configuration.h>
-#include <wc/Thread.h>
 #include <wc/WheelMovement.h>
 #include <wc/WheelMovement_Configuration.h>
 
@@ -14,6 +24,10 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
+
+
+#define WHEELNUM 2
 
 
 static SDL_Window * window = NULL;
@@ -21,7 +35,8 @@ static SDL_GLContext glContext = 0;
 
 static wcConfiguration * configuration = NULL;
 static wcConnection * connection = NULL;
-static wcThread * thread = NULL;
+
+static int wheelRotationIncrements[WHEELNUM] = { 0 };
 
 
 bool init_sdl()
@@ -35,7 +50,7 @@ bool init_sdl()
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
 
-	window = SDL_CreateWindow( "WheelChar SDL2/OpenGL Example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE );
+	window = SDL_CreateWindow( "WheelChar SDL2/OpenGL Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE );
 	if( !window )
 	{
 		fprintf( stderr, "Failed to create Window: %s\n", SDL_GetError() );
@@ -82,12 +97,6 @@ bool init_wc( int argc, const char ** argv )
 		return false;
 	}
 
-	thread = wcThread_start( connection );
-	if( !thread )
-	{
-		fprintf( stderr, "Failed to start thread\n" );
-		return false;
-	}
 	return true;
 }
 
@@ -104,38 +113,74 @@ bool init( int argc, const char ** argv )
 }
 
 
+static inline double fraction( double d )
+{
+	return d - floor(d);
+}
+
+
+static int mouseX = 0;
+static int mouseY = 0;
+
+
+void emulatedWheelMovement_update()
+{
+	SDL_GetRelativeMouseState( &mouseX, &mouseY );
+}
+
+
+int emulatedWheelMovement_getIncrements( unsigned int i )
+{
+	int increments = 0.0;
+	i++;
+	if( i&1 )
+		increments += mouseX;
+	if( i&2 )
+		increments += mouseY * 8;
+	return increments;
+}
+
+
+void sendWheelMovement( unsigned int index, int movementIncrements )
+{
+	wcPacket packet;
+	wcPacket_Wheel_create( (wcPacket_Wheel*)&packet, index, WC_ERROR_NOERROR, movementIncrements );
+	wcConnection_write( connection, &packet );
+}
+
+
+// http://stackoverflow.com/questions/12089514/real-modulo-operator-in-c-c
+static inline int modulo( int a, int b )
+{
+	const int result = a % b;
+	return result >= 0 ? result : result + b;
+}
+
+
 void update()
 {
 	glClear( GL_COLOR_BUFFER_BIT );
 
-	wcWheelMovement wmA = wcThread_retrieveWheelMovement( thread, 0 );
-	wcWheelMovement wmB = wcThread_retrieveWheelMovement( thread, 1 );
+	emulatedWheelMovement_update();
 
-	static float rotA = 0;
-	static float rotB = 0;
-	rotA += wcWheelMovement_getTurns( &wmA, configuration ) * 360.0f;
-	rotB += wcWheelMovement_getTurns( &wmB, configuration ) * 360.0f;
-
-	glPushMatrix();
-		glColor3f(1,0,0);
-		glRotatef( rotB, 0,0,1 );
-		glBegin( GL_QUADS );
-			glVertex2f( -0.5f, -0.5f );
-			glVertex2f( 0.5f, -0.5f );
-			glVertex2f( 0.5f, 0.5f );
-			glVertex2f( -0.5f, 0.5f );
-		glEnd();
-	glPopMatrix();
-	glPushMatrix();
-		glColor3f(0,1,0);
-		glRotatef( rotA, 0,0,1 );
-		glBegin( GL_QUADS );
-			glVertex2f( -0.5f, -0.5f );
-			glVertex2f( 0.5f, -0.5f );
-			glVertex2f( 0.5f, 0.5f );
-			glVertex2f( -0.5f, 0.5f );
-		glEnd();
-	glPopMatrix();
+	for( unsigned int i=0; i<WHEELNUM; i++ )
+	{
+		int increments = emulatedWheelMovement_getIncrements( i );
+		sendWheelMovement( i, increments );
+		wheelRotationIncrements[i] += increments;
+		wheelRotationIncrements[i] = modulo( wheelRotationIncrements[i], wcConfiguration_getWheelIncrementsPerTurn( configuration, i ) );
+		glPushMatrix();
+			unsigned char color = i+1;
+			glColor3f( color&1, color&2, color&4 );
+			glRotatef( ( (double)wheelRotationIncrements[i] / (double)wcConfiguration_getWheelIncrementsPerTurn( configuration, i ) ) * 360.0f, 0,0,1 );
+			glBegin( GL_QUADS );
+				glVertex2f( -0.5f, -0.5f );
+				glVertex2f( 0.5f, -0.5f );
+				glVertex2f( 0.5f, 0.5f );
+				glVertex2f( -0.5f, 0.5f );
+			glEnd();
+		glPopMatrix();
+	}
 }
 
 
@@ -151,8 +196,6 @@ void quit_sdl()
 
 void quit_wc()
 {
-	wcThread_stop( thread );
-	thread = NULL;
 	wcConnection_close( connection );
 	connection = NULL;
 	wcConfiguration_delete( configuration );

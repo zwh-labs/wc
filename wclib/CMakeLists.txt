@@ -17,6 +17,7 @@ set( wc_sources
 	src/Configuration_stdio.c
 	src/Configuration_ArgumentParser.c
 	src/WheelMovement_Configuration.c
+	src/WheelPIDController.c
 )
 
 include_directories( include )
@@ -27,7 +28,13 @@ add_library( wc SHARED ${wc_sources} )
 set_target_properties( wc PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
 set_target_properties( wc PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
 set_target_properties( wc PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
-target_link_libraries( wc ${CMAKE_THREAD_LIBS_INIT} )
+
+if( UNIX )
+	set( MATH_LIB m )
+else()
+	set( MATH_LIB )
+endif()
+target_link_libraries( wc ${CMAKE_THREAD_LIBS_INIT} ${MATH_LIB} )
 
 generate_export_header( wc )
 if( CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_GNUCC )
