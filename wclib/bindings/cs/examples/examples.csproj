@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<BaseOutputPath>.\bin</BaseOutputPath>
+	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="..\*.cs" />
 	</ItemGroup>
 	<Target Name="Build">
-		<Csc Sources="@(Compile);ThreadCS.cs" OutputAssembly="ThreadCS.exe" />
+		<Csc Sources="@(Compile);ExampleThread.cs" OutputAssembly="$(BaseOutputPath)\wcCSExampleThread.exe" />
 	</Target>
 </Project>

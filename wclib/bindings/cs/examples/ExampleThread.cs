@@ -2,7 +2,7 @@ using System;
 using WC;
 
 
-public class ThreadCS
+public class ExampleThread
 {
 	static public void Main()
 	{
