@@ -23,7 +23,7 @@ public class WheelPIDController
 	[DllImport("libwc")] private static extern void wcWheelPIDController_setDerivativeGain( IntPtr wheelPIDController, double gain );
 	[DllImport("libwc")] private static extern void wcWheelPIDController_setWindupGuard( IntPtr wheelPIDController, double guard );
 
-	[DllImport("libwc")] private static extern void wcWheelPIDController_update( IntPtr wheelPIDController, int targetAngleIncrements, int actualAngleIncrements, double delta );
+	[DllImport("libwc")] private static extern double wcWheelPIDController_update( IntPtr wheelPIDController, int targetAngleIncrements, int actualAngleIncrements, double delta );
 
 	internal IntPtr handle;
 
@@ -32,25 +32,25 @@ public class WheelPIDController
 
 	public double proportionalGain
 	{
-		get { return wcWheelPIDController_getProportionalGain(); }
+		get { return wcWheelPIDController_getProportionalGain( handle ); }
 		set { wcWheelPIDController_setProportionalGain( handle, value ); }
 	}
 
 	public double integralGain
 	{
-		get { return wcWheelPIDController_getIntegralGain(); }
+		get { return wcWheelPIDController_getIntegralGain( handle ); }
 		set { wcWheelPIDController_setIntegralGain( handle, value ); }
 	}
 
 	public double derivativeGain
 	{
-		get { return wcWheelPIDController_getDerivativeGain(); }
+		get { return wcWheelPIDController_getDerivativeGain( handle ); }
 		set { wcWheelPIDController_setDerivativeGain( handle, value ); }
 	}
 
 	public double windupGuard
 	{
-		get { return wcWheelPIDController_getWindupGuard(); }
+		get { return wcWheelPIDController_getWindupGuard( handle ); }
 		set { wcWheelPIDController_setWindupGuard( handle, value ); }
 	}
 
