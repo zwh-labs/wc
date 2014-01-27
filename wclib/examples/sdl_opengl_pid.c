@@ -124,6 +124,15 @@ bool init( int argc, const char ** argv )
 }
 
 
+
+// http://stackoverflow.com/questions/12089514/real-modulo-operator-in-c-c
+static inline int modulo( int a, int b )
+{
+	const int result = a % b;
+	return result >= 0 ? result : result + b;
+}
+
+
 static inline double fraction( double d )
 {
 	return d - floor(d);
@@ -147,7 +156,7 @@ void update()
 
 		wcWheelMovement wm = wcThread_retrieveWheelMovement( thread, i );
 		targetWheelAngleIncrements[i] += wcWheelMovement_getIncrements( &wm );
-		targetWheelAngleIncrements[i] %= incrementsPerTurn;
+		targetWheelAngleIncrements[i] = modulo( targetWheelAngleIncrements[i], incrementsPerTurn );
 
 		int actualAngleIncrements = wheelRotations[i] * (double)incrementsPerTurn;
 		double controlValue = wcWheelPIDController_update( wheelControllers[i], targetWheelAngleIncrements[i], actualAngleIncrements, delta );

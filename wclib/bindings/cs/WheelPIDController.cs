@@ -8,7 +8,7 @@ namespace WC
 
 public class WheelPIDController
 {
-	[DllImport("libwc")] private static extern IntPtr wcWheelPIDController_new();
+	[DllImport("libwc")] private static extern IntPtr wcWheelPIDController_new( IntPtr configuration, uint wheelIndex );
 	[DllImport("libwc")] private static extern bool wcWheelPIDController_delete( IntPtr wheelPIDController );
 
 	[DllImport("libwc")] private static extern void wcWheelPIDController_reset( IntPtr wheelPIDController );
@@ -27,7 +27,7 @@ public class WheelPIDController
 
 	internal IntPtr handle;
 
-	public WheelPIDController() { handle = wcWheelPIDController_new(); }
+	public WheelPIDController( Configuration configuration, uint wheelIndex ) { handle = wcWheelPIDController_new( configuration.handle, wheelIndex ); }
 	~WheelPIDController() { wcWheelPIDController_delete( handle ); }
 
 	public double proportionalGain

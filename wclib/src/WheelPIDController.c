@@ -69,7 +69,7 @@ void wcWheelPIDController_setIntegralGain( wcWheelPIDController * controller, do
 }
 
 
-void wcWheelPIDController_setDerivative( wcWheelPIDController * controller, double gain )
+void wcWheelPIDController_setDerivativeGain( wcWheelPIDController * controller, double gain )
 {
 	controller->derivativeGain = gain;
 }
@@ -93,7 +93,7 @@ double wcWheelPIDController_getIntegralGain( const wcWheelPIDController * contro
 }
 
 
-double wcWheelPIDController_getDerivative( const wcWheelPIDController * controller )
+double wcWheelPIDController_getDerivativeGain( const wcWheelPIDController * controller )
 {
 	return controller->derivativeGain;
 }
