@@ -14,7 +14,7 @@ typedef struct _wcWheelPIDController wcWheelPIDController;
 extern "C" {
 #endif
 
-WC_EXPORT wcWheelPIDController * wcWheelPIDController_new( const wcConfiguration * configuration, unsigned int wheelIndex );
+WC_EXPORT wcWheelPIDController * wcWheelPIDController_new();
 WC_EXPORT bool wcWheelPIDController_delete( wcWheelPIDController * controller );
 
 WC_EXPORT void wcWheelPIDController_reset( wcWheelPIDController * controller );
@@ -29,7 +29,8 @@ WC_EXPORT double wcWheelPIDController_getIntegralGain( const wcWheelPIDControlle
 WC_EXPORT double wcWheelPIDController_getDerivativeGain( const wcWheelPIDController * controller );
 WC_EXPORT double wcWheelPIDController_getWindupGuard( const wcWheelPIDController * controller );
 
-WC_EXPORT double wcWheelPIDController_update( wcWheelPIDController * controller, int targetAngleIncrements, int actualAngleIncrements, double delta );
+WC_EXPORT double wcWheelPIDController_update( wcWheelPIDController * controller, double currentError, double delta );
+WC_EXPORT double wcWheelPIDController_updateAngular( wcWheelPIDController * controller, int targetAngleIncrements, int actualAngleIncrements, int incrementsPerTurn, double delta );
 
 #ifdef __cplusplus
 }

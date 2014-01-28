@@ -11,9 +11,7 @@
 
 struct _wcWheelPIDController
 {
-	const wcConfiguration * configuration;
-	unsigned int wheelIndex;
-	int previousError;
+	double previousError;
 	double integratedError;
 
 	double windupGuard;
@@ -23,14 +21,12 @@ struct _wcWheelPIDController
 };
 
 
-wcWheelPIDController * wcWheelPIDController_new( const wcConfiguration * configuration, unsigned int wheelIndex )
+wcWheelPIDController * wcWheelPIDController_new()
 {
 	wcWheelPIDController * controller = (wcWheelPIDController*) malloc( sizeof(wcWheelPIDController) );
 
-	controller->configuration = configuration;
-	controller->wheelIndex = wheelIndex;
-	controller->previousError = 0;
-	controller->integratedError = 0;
+	controller->previousError = 0.0;
+	controller->integratedError = 0.0;
 
 	controller->windupGuard = FLT_MAX;
 	controller->proportionalGain = 0.0001;
@@ -52,8 +48,8 @@ bool wcWheelPIDController_delete( wcWheelPIDController * controller )
 
 void wcWheelPIDController_reset( wcWheelPIDController * controller )
 {
-	controller->previousError = 0;
-	controller->integratedError = 0;
+	controller->previousError = 0.0;
+	controller->integratedError = 0.0;
 }
 
 
@@ -114,17 +110,10 @@ static inline int modulo( int a, int b )
 
 
 // http://nicisdigital.wordpress.com/2011/06/27/proportional-integral-derivative-pid-controller/
-double wcWheelPIDController_update( wcWheelPIDController * controller, int targetAngleIncrements, int actualAngleIncrements, double delta )
+double wcWheelPIDController_update( wcWheelPIDController * controller, double currentError, double delta )
 {
-	int incrementsPerTurn = wcConfiguration_getWheelIncrementsPerTurn( controller->configuration, controller->wheelIndex );
-
-	// the shortest distance between both angles
-	int currentError = targetAngleIncrements - actualAngleIncrements;
-	int halfIncrementsPerTurn = wcConfiguration_getWheelIncrementsPerTurn( controller->configuration, controller->wheelIndex ) >> 1;
-	currentError = modulo( (currentError + halfIncrementsPerTurn), incrementsPerTurn ) - halfIncrementsPerTurn;
-
 	// integration with windup guarding
-	controller->integratedError += (double)currentError * delta;
+	controller->integratedError += currentError * delta;
 	if( controller->integratedError < -(controller->windupGuard) )
 		controller->integratedError = -(controller->windupGuard);
 	else if( controller->integratedError > controller->windupGuard )
@@ -147,4 +136,15 @@ double wcWheelPIDController_update( wcWheelPIDController * controller, int targe
 	controller->previousError = currentError;
 
 	return control;
+}
+
+
+double wcWheelPIDController_updateAngular( wcWheelPIDController * controller, int targetAngleIncrements, int actualAngleIncrements, int incrementsPerTurn, double delta )
+{
+	// the shortest distance between both angles
+	int currentError = targetAngleIncrements - actualAngleIncrements;
+	int halfIncrementsPerTurn = incrementsPerTurn >> 1;
+	currentError = modulo( (currentError + halfIncrementsPerTurn), incrementsPerTurn ) - halfIncrementsPerTurn;
+
+	return wcWheelPIDController_update( controller, (double)currentError, delta );
 }

@@ -100,7 +100,7 @@ bool init_wc( int argc, const char ** argv )
 
 	for( int i=0; i<WHEELNUM; i++ )
 	{
-		wheelControllers[i] = wcWheelPIDController_new( configuration, i );
+		wheelControllers[i] = wcWheelPIDController_new();
 		if( !wheelControllers[i] )
 		{
 			fprintf( stderr, "Failed to instantiate PID controller\n" );
@@ -159,7 +159,7 @@ void update()
 		targetWheelAngleIncrements[i] = modulo( targetWheelAngleIncrements[i], incrementsPerTurn );
 
 		int actualAngleIncrements = wheelRotations[i] * (double)incrementsPerTurn;
-		double controlValue = wcWheelPIDController_update( wheelControllers[i], targetWheelAngleIncrements[i], actualAngleIncrements, delta );
+		double controlValue = wcWheelPIDController_updateAngular( wheelControllers[i], targetWheelAngleIncrements[i], actualAngleIncrements, incrementsPerTurn, delta );
 		wheelVelocities[i] += controlValue;
 		wheelRotations[i] += wheelVelocities[i];
 		wheelRotations[i] = fraction(wheelRotations[i]);

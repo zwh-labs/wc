@@ -8,7 +8,7 @@ namespace WC
 
 public class WheelPIDController
 {
-	[DllImport("libwc")] private static extern IntPtr wcWheelPIDController_new( IntPtr configuration, uint wheelIndex );
+	[DllImport("libwc")] private static extern IntPtr wcWheelPIDController_new();
 	[DllImport("libwc")] private static extern bool wcWheelPIDController_delete( IntPtr wheelPIDController );
 
 	[DllImport("libwc")] private static extern void wcWheelPIDController_reset( IntPtr wheelPIDController );
@@ -23,11 +23,12 @@ public class WheelPIDController
 	[DllImport("libwc")] private static extern void wcWheelPIDController_setDerivativeGain( IntPtr wheelPIDController, double gain );
 	[DllImport("libwc")] private static extern void wcWheelPIDController_setWindupGuard( IntPtr wheelPIDController, double guard );
 
-	[DllImport("libwc")] private static extern double wcWheelPIDController_update( IntPtr wheelPIDController, int targetAngleIncrements, int actualAngleIncrements, double delta );
+	[DllImport("libwc")] private static extern double wcWheelPIDController_update( IntPtr wheelPIDController, double currentError, double delta );
+	[DllImport("libwc")] private static extern double wcWheelPIDController_updateAngular( IntPtr wheelPIDController, int targetAngleIncrements, int actualAngleIncrements, int incrementsPerTurn, double delta );
 
 	internal IntPtr handle;
 
-	public WheelPIDController( Configuration configuration, uint wheelIndex ) { handle = wcWheelPIDController_new( configuration.handle, wheelIndex ); }
+	public WheelPIDController() { handle = wcWheelPIDController_new(); }
 	~WheelPIDController() { wcWheelPIDController_delete( handle ); }
 
 	public double proportionalGain
@@ -59,9 +60,14 @@ public class WheelPIDController
 		wcWheelPIDController_reset( handle );
 	}
 
-	public double update( int targetAngleIncrements, int actualAngleIncrements, double delta )
+	public double update( double currentError, double delta )
 	{
-		return wcWheelPIDController_update( handle, targetAngleIncrements, actualAngleIncrements, delta );
+		return wcWheelPIDController_update( handle, currentError, delta );
+	}
+
+	public double updateAngular( int targetAngleIncrements, int actualAngleIncrements, int incrementsPerTurn, double delta )
+	{
+		return wcWheelPIDController_updateAngular( handle, targetAngleIncrements, actualAngleIncrements, incrementsPerTurn, delta );
 	}
 }
 
