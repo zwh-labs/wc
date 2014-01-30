@@ -7,6 +7,6 @@
 		<Compile Include="..\*.cs" />
 	</ItemGroup>
 	<Target Name="Build">
-		<Csc Sources="@(Compile);ExampleThread.cs" OutputAssembly="$(BaseOutputPath)\wcCSExampleThread.exe" />
+		<Csc Sources="@(Compile);ExampleThread.cs" OutputAssembly="$(BaseOutputPath)\wc-sharp-ExampleThread.exe" />
 	</Target>
 </Project>

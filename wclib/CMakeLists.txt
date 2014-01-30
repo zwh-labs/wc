@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 2.6 )
 cmake_policy( SET CMP0015 NEW )
-project( wc )
+project( wclib )
 
 include( GenerateExportHeader )
 
@@ -53,11 +53,4 @@ if( BUILD_EXAMPLES )
 	add_subdirectory( examples )
 else()
 	message( STATUS "NOT building native C examples" )
-endif()
-
-set( BUILD_BINDINGS_CS_EXAMPLES FALSE CACHE BOOL "Build C# examples" )
-if( BUILD_BINDINGS_CS_EXAMPLES )
-	add_subdirectory( bindings/cs/examples )
-else()
-	message( STATUS "NOT building C# examples" )
 endif()
