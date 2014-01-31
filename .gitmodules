@@ -1,0 +1,9 @@
+[submodule "wclib"]
+	path = wclib
+	url = git@github.com:zwh-labs/wclib.git
+[submodule "wcfw"]
+	path = wcfw
+	url = git@github.com:zwh-labs/wcfw.git
+[submodule "wc-sharp"]
+	path = wc-sharp
+	url = git@github.com:zwh-labs/wc-sharp.git
