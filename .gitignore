@@ -14,9 +14,5 @@
 *.kdev4
 CMakeCache.txt
 CMakeFiles/
-wclib/Makefile
-wclib/bin/
-wclib/lib/
-wclib/examples/Makefile
 build/
 build.*/
