@@ -7,3 +7,6 @@
 [submodule "wc-sharp"]
 	path = wc-sharp
 	url = git@github.com:zwh-labs/wc-sharp.git
+[submodule "wc-lua"]
+	path = wc-lua
+	url = git@github.com:zwh-labs/wc-lua.git
